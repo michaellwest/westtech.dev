@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-accent: #2563eb;
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  /* Dark mode via class on <html> */
+  html.dark {
+    color-scheme: dark;
+  }
+}

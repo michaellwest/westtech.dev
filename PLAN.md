@@ -115,14 +115,14 @@ tags: [sitecore, dotnet]
 | # | Step                                              | Status      |
 | - | ------------------------------------------------- | ----------- |
 | 1 | Document plan + initialize git tracking           | ✅ Complete |
-| 2 | Scaffold Astro 5 project (Tailwind v4, sitemap, RSS) | ⬜ Pending |
-| 3 | Configure content collections with Zod schema     | ⬜ Pending  |
-| 4 | Build BaseLayout + PostLayout                     | ⬜ Pending  |
-| 5 | Build components (Header, Footer, PostCard, TagPill, ThemeToggle) | ⬜ Pending |
-| 6 | Build pages (home, post, tag, search, RSS)        | ⬜ Pending  |
-| 7 | Configure Shiki github-dark theme                 | ⬜ Pending  |
-| 8 | Integrate Pagefind search                         | ⬜ Pending  |
-| 9 | Add Cloudflare Web Analytics                      | ⬜ Pending  |
-| 10| Write PowerShell helper scripts (new-post, paste-image) | ⬜ Pending |
-| 11| Seed blog with 5 migrated posts from Blogspot     | ⬜ Pending  |
-| 12| Final README with Cloudflare Pages deploy guide   | ⬜ Pending  |
+| 2 | Scaffold Astro 5 project (Tailwind v4, sitemap, RSS) | ✅ Complete |
+| 3 | Configure content collections with Zod schema     | ✅ Complete |
+| 4 | Build BaseLayout + PostLayout                     | ✅ Complete |
+| 5 | Build components (Header, Footer, PostCard, TagPill, ThemeToggle) | ✅ Complete |
+| 6 | Build pages (home, post, tag, search, RSS)        | ✅ Complete |
+| 7 | Configure Shiki github-dark theme                 | ✅ Complete |
+| 8 | Integrate Pagefind search                         | ✅ Complete |
+| 9 | Add Cloudflare Web Analytics                      | ✅ Complete |
+| 10| Write PowerShell helper scripts (new-post, paste-image) | ✅ Complete |
+| 11| Seed blog with 6 migrated posts from Blogspot     | ✅ Complete |
+| 12| Final README with Cloudflare Pages deploy guide   | ✅ Complete |

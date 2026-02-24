@@ -30,15 +30,59 @@ Recently I found over 60% of the Sitecore master and web databases were consumed
 
 ## What we used
 
-One script that proved particularly useful was a simple row count query to monitor progress while the cleanup ran:
+Full scripts are in this gist: [gist.github.com/michaellwest/9a9a7b78ac4f1a3463fe3d59ad5455f2](https://gist.github.com/michaellwest/9a9a7b78ac4f1a3463fe3d59ad5455f2)
+
+**CountBlobsTotal.sql** — faster than `SELECT COUNT(1)` on a large table because it reads partition statistics instead of scanning rows:
 
 ```sql
-SELECT COUNT(*) AS TotalBlobRecords FROM [dbo].[Blobs]
+/* Count all the rows in the Blobs table.
+   Considerably faster than SELECT COUNT(1) FROM [Blobs] */
+SELECT
+   Total_Rows= SUM(st.row_count)
+FROM
+   sys.dm_db_partition_stats st
+WHERE
+    object_name(object_id) = 'Blobs' AND (index_id < 2)
 ```
 
-To identify orphaned records — blobs with no corresponding item reference — the general approach is a `LEFT JOIN` between the `Blobs` table and the relevant field references in `SharedFields` and `VersionedFields`, then deleting rows where no match is found.
+**CountUnusedBlobs.sql** — identifies orphaned records by cross-referencing the `Blobs` table against every field table that can reference a blob. Checks both braced and unbraced GUID formats:
 
-Run this in batches. Deleting 100k records in a single transaction on a live database is a bad time.
+```sql
+/* Returns the count of unused blobs both in total and a unique list. */
+WITH [ExistingBlobs] ([BlobId]) AS (
+    SELECT [Blobs].[BlobId] FROM [Blobs]
+    JOIN [SharedFields] ON '{' + CONVERT(NVARCHAR(MAX), [Blobs].[BlobId]) + '}' = [SharedFields].[Value]
+    UNION
+    SELECT [Blobs].[BlobId] FROM [Blobs]
+    JOIN [SharedFields] ON CONVERT(NVARCHAR(MAX), [Blobs].[BlobId]) = [SharedFields].[Value]
+    UNION
+    SELECT [Blobs].[BlobId] FROM [Blobs]
+    JOIN [VersionedFields] ON '{' + CONVERT(NVARCHAR(MAX), [Blobs].[BlobId]) + '}' = [VersionedFields].[Value]
+    UNION
+    SELECT [Blobs].[BlobId] FROM [Blobs]
+    JOIN [VersionedFields] ON CONVERT(NVARCHAR(MAX), [Blobs].[BlobId]) = [VersionedFields].[Value]
+    UNION
+    SELECT [Blobs].[BlobId] FROM [Blobs]
+    JOIN [UnversionedFields] ON '{' + CONVERT(NVARCHAR(MAX), [Blobs].[BlobId]) + '}' = [UnversionedFields].[Value]
+    UNION
+    SELECT [Blobs].[BlobId] FROM [Blobs]
+    JOIN [UnversionedFields] ON CONVERT(NVARCHAR(MAX), [Blobs].[BlobId]) = [UnversionedFields].[Value]
+    UNION
+    SELECT [Blobs].[BlobId] FROM [Blobs]
+    JOIN [ArchivedFields] ON '{' + CONVERT(NVARCHAR(MAX), [Blobs].[BlobId]) + '}' = [ArchivedFields].[Value]
+    UNION
+    SELECT [Blobs].[BlobId] FROM [Blobs]
+    JOIN [ArchivedFields] ON CONVERT(NVARCHAR(MAX), [Blobs].[BlobId]) = [ArchivedFields].[Value]
+)
+SELECT
+  COUNT([Blobs].[BlobId]) AS [UnusedCount],
+  COUNT(DISTINCT [Blobs].[BlobId]) AS [UnusedDistinctCount]
+FROM [Blobs]
+LEFT JOIN [ExistingBlobs] ON [Blobs].[BlobId] = [ExistingBlobs].[BlobId]
+WHERE [ExistingBlobs].[BlobId] IS NULL
+```
+
+**CleanUnusedBlobs.sql** — the actual deletion script. It uses the same CTE to identify orphans, loads them into a temp table, then deletes in batches of 1,000 with a loop cap of 10,000 iterations. Each batch is its own transaction. Full script in the gist above — review it before you run it.
 
 ## Takeaway
 

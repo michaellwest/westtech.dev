@@ -10,20 +10,36 @@ In this article we investigate an intermittent SSL failure that had nothing to d
 
 ## The error
 
-A non-production environment started throwing errors when a custom contact form built on Sitecore MVC attempted to POST to an external service hosted by another team. The error logged in the Sitecore log files was straightforward enough:
+A non-production environment started throwing errors when a custom contact form built on Sitecore MVC attempted to POST to an external service hosted by another team. The full exception logged in the Sitecore log files looked like this:
 
 ```
-The remote certificate is invalid according to the validation procedure.
+Exception: System.Security.Authentication.AuthenticationException
+Message: The remote certificate is invalid according to the validation procedure.
+Source: System
+   at System.Net.Security.SslState.StartSendAuthResetSignal(ProtocolToken message, AsyncProtocolRequest asyncRequest, Exception exception)
+   at System.Net.Security.SslState.CheckCompletionBeforeNextReceive(ProtocolToken message, AsyncProtocolRequest asyncRequest)
+   at System.Net.Security.SslState.ProcessReceivedBlob(Byte[] buffer, Int32 count, AsyncProtocolRequest asyncRequest)
+   ...
+   at System.Net.TlsStream.Write(Byte[] buffer, Int32 offset, Int32 size)
+   at System.Net.PooledStream.Write(Byte[] buffer, Int32 offset, Int32 size)
+   at System.Net.ConnectStream.WriteHeaders(Boolean async)
 ```
+
+Gist: [gist.github.com/michaellwest/71bcd53ab6291a2130b9d3648a2c9ad8](https://gist.github.com/michaellwest/71bcd53ab6291a2130b9d3648a2c9ad8)
 
 The certificate on the target service was a LetsEncrypt certificate — valid, not expired, trusted by the OS. So what gives?
 
 ## What we found
 
-After confirming the service URL was reachable and the LetsEncrypt root was present in the server's Trusted Root certificate store, we ran `certutil` against the certificate to inspect it:
+After confirming the service URL was reachable and the LetsEncrypt root was present in the server's Trusted Root certificate store, we used the script below to export the certificate and run `certutil` against it:
 
 ```powershell
-certutil -verify -urlfetch .\service.cer
+$webRequest = [Net.WebRequest]::Create("https://www.company.com")
+try { $webRequest.GetResponse() } catch {}
+$cert = $webRequest.ServicePoint.Certificate
+$bytes = $cert.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert)
+Set-Content -Value $bytes -Encoding Byte -Path "$pwd\company.cer"
+certutil.exe -verify -urlfetch "$pwd\company.cer"
 ```
 
 The output showed repeated attempts to reach domains under `lencr.org` — the domain LetsEncrypt uses for Online Certificate Status Protocol (OCSP) and CRL distribution point lookups. .NET validates the certificate chain on every outbound HTTPS call, which includes checking whether the certificate has been revoked.

@@ -30,6 +30,26 @@ The workaround is tedious: track which fields are affected and manually restore 
 
 The fix for both: update `Unicorn.config` to serialize `__Revision`, then reserialize all your content. It's not a quick task on a large solution, but it prevents subtle data loss during publish.
 
+## How to fix it: reserialize with SPE
+
+Once you've updated `Unicorn.config` to include `__Revision`, you need to reserialize the affected items. This SPE script processes a list of content paths and calls `Export-UnicornItem` on each one:
+
+```powershell
+$lines = @"
+/sitecore/content/home
+"@
+
+$paths = $lines.Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries)
+
+foreach ($path in $paths) {
+    Get-Item -Path ($path.Replace("/sitecore", "master:")) | Export-UnicornItem
+}
+```
+
+Gist: [gist.github.com/michaellwest/203d113e48470b6ebec781871dd25e7c](https://gist.github.com/michaellwest/203d113e48470b6ebec781871dd25e7c)
+
+Add your affected paths to the here-string and run it from the SPE console. For 40,000 items this takes a while — run it off-hours.
+
 ## How to find the damage
 
 An SPE report works well for identifying items that have language versions in the content tree but no fields in their serialized representation. Query against your serialized root paths and flag anything where a language version section exists but contains no field entries.

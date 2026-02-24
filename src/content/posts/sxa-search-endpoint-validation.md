@@ -16,9 +16,27 @@ Sitecore acknowledged this as a bug (reference **589620**) affecting SXA through
 
 ## Option 1: Logging filters (interim)
 
-If you want a quick fix that just kills the noise without blocking traffic, add a logging filter to suppress the specific exception class being thrown. This stops the log spam but doesn't actually reject the bad requests.
+If you want a quick fix that just kills the noise without blocking traffic, add a log4net `StringMatchFilter` to suppress the specific exception string from the `LogFileAppender`. Drop this config patch into your `App_Config/Include` folder:
 
-It works, but you're hiding symptoms rather than treating the cause.
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns:patch="http://www.sitecore.net/xmlconfig/">
+  <sitecore>
+    <log4net>
+      <appender name="LogFileAppender" type="log4net.Appender.RollingFileAppender, Sitecore.Logging">
+        <filter type="log4net.Filter.StringMatchFilter">
+          <stringToMatch value="Results endpoint exception" />
+          <acceptOnMatch value="false" />
+        </filter>
+      </appender>
+    </log4net>
+  </sitecore>
+</configuration>
+```
+
+Gist: [gist.github.com/michaellwest/be74798d06477d1f0151c27916520f87](https://gist.github.com/michaellwest/be74798d06477d1f0151c27916520f87)
+
+This stops the log spam but doesn't actually reject the bad requests. You're hiding symptoms rather than treating the cause.
 
 ## Option 2: Block at the WAF (preferred)
 

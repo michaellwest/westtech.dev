@@ -51,6 +51,9 @@ const formattedDate = date.toLocaleDateString("en-US", {
 </BaseLayout>
 
 <style>
+  /* Tailwind v4 requires @reference in scoped style blocks that use @apply */
+  @reference "../styles/global.css";
+
   /* Scoped prose styles — avoids needing @tailwindcss/typography plugin */
   .prose-styles :global(h2) {
     @apply text-xl font-semibold mt-8 mb-3 text-zinc-900 dark:text-zinc-100;

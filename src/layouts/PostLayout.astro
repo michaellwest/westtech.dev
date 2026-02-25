@@ -1,54 +1,56 @@
 ---
-import BaseLayout from "./BaseLayout.astro";
+import SiteLayout from "./SiteLayout.astro";
 import TagPill from "../components/TagPill.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 
 interface Props {
   title: string;
-  date: Date;
+  created: Date;
+  updated?: Date;
   description: string;
   tags: string[];
 }
 
-const { title, date, description, tags } = Astro.props;
+const { title, created, updated, description, tags } = Astro.props;
 
-const formattedDate = date.toLocaleDateString("en-US", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
+const formatDate = (d: Date) =>
+  d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 ---
 
-<BaseLayout title={title} description={description}>
-  <Header />
-
-  <main class="flex-1 w-full max-w-2xl lg:max-w-4xl mx-auto px-4 py-10 sm:px-6">
-    <article>
-      <header class="mb-8">
-        <div class="flex flex-wrap gap-2 mb-3">
-          {tags.map((tag) => <TagPill tag={tag} />)}
-        </div>
-        <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-2">
-          {title}
-        </h1>
+<SiteLayout title={title} description={description}>
+  <article>
+    <header class="mb-8">
+      <div class="flex flex-wrap gap-2 mb-3">
+        {tags.map((tag) => <TagPill tag={tag} />)}
+      </div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-2">
+        {title}
+      </h1>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
         <time
-          datetime={date.toISOString()}
+          datetime={created.toISOString()}
           class="text-sm text-zinc-500 dark:text-zinc-400"
         >
-          {formattedDate}
+          {formatDate(created)}
         </time>
-      </header>
-
-      <!-- Prose styles for rendered Markdown -->
-      <div class="prose-styles">
-        <slot />
+        {
+          updated && (
+            <time
+              datetime={updated.toISOString()}
+              class="text-sm text-zinc-400 dark:text-zinc-500 italic"
+            >
+              Updated {formatDate(updated)}
+            </time>
+          )
+        }
       </div>
-    </article>
-  </main>
+    </header>
 
-  <Footer />
-</BaseLayout>
+    <!-- Prose styles for rendered Markdown -->
+    <div class="prose-styles">
+      <slot />
+    </div>
+  </article>
+</SiteLayout>
 
 <style>
   /* Tailwind v4 requires @reference in scoped style blocks that use @apply */

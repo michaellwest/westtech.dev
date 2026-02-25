@@ -1,6 +1,6 @@
 ---
 title: "Working with Unicorn and Sitecore CLI"
-date: 2023-01-16
+created: 2023-01-16
 description: "Running Unicorn and Sitecore CLI side-by-side during a staged migration surfaces some subtle compatibility problems worth knowing about."
 tags: ["sitecore", "serialization", "unicorn", "sitecore-cli"]
 draft: false

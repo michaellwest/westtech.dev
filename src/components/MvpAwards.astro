@@ -1,0 +1,36 @@
+---
+const awards = [
+  { year: 2026, file: "mvp-2026.png" },
+  { year: 2025, file: "mvp-2025.png" },
+  { year: 2024, file: "mvp-2024.png" },
+  { year: 2023, file: "mvp-2023.png" },
+  { year: 2022, file: "mvp-2022.png" },
+  { year: 2021, file: "mvp-2021.png" },
+  { year: 2020, file: "mvp-2020.png" },
+  { year: 2019, file: "mvp-2019.png" },
+  { year: 2018, file: "mvp-2018.png" },
+  { year: 2017, file: "mvp-2017.png" },
+  { year: 2016, file: "mvp-2016.png" },
+  { year: 2015, file: "mvp-2015.png" },
+];
+---
+
+<div>
+  <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">
+    Sitecore MVP
+  </h2>
+  <div class="grid grid-cols-3 gap-1.5">
+    {
+      awards.map(({ year, file }) => (
+        <img
+          src={`/images/mvp/${file}`}
+          alt={`Sitecore MVP ${year}`}
+          title={`Sitecore MVP ${year}`}
+          width="80"
+          height="80"
+          class="w-full rounded object-contain"
+        />
+      ))
+    }
+  </div>
+</div>

@@ -1,6 +1,6 @@
 ---
 title: "Replacement Task Scheduler for Sitecore"
-date: 2022-08-27
+created: 2022-08-27
 description: "Sitecore's built-in task scheduler has some well-known limitations. Here's how we replaced it with Hangfire for more reliable background job scheduling."
 tags: ["sitecore", "dotnet", "hangfire"]
 draft: false

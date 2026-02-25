@@ -1,6 +1,6 @@
 ---
 title: "PrecisionScheduler v1.1.0: Fixing the Bugs That Hurt in Production"
-date: 2026-02-25
+created: 2026-02-25
 description: "Six issues closed, one breaking config rename, and a completely rethought missed-run detection — here's what changed in PrecisionScheduler v1.1.0 and why."
 tags: ["sitecore", "dotnet", "hangfire"]
 draft: false

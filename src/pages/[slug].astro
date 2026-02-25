@@ -16,7 +16,8 @@ const { Content } = await render(post);
 
 <PostLayout
   title={post.data.title}
-  date={post.data.date}
+  created={post.data.created}
+  updated={post.data.updated}
   description={post.data.description}
   tags={post.data.tags}
 >

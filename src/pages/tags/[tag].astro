@@ -1,8 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
 import PostCard from "../../components/PostCard.astro";
 
 export async function getStaticPaths() {
@@ -19,7 +17,7 @@ export async function getStaticPaths() {
     const slug = tag.toLowerCase().replace(/\s+/g, "-");
     const filtered = posts
       .filter((p) => p.data.tags.includes(tag))
-      .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+      .sort((a, b) => b.data.created.getTime() - a.data.created.getTime());
 
     return {
       params: { tag: slug },
@@ -31,40 +29,34 @@ export async function getStaticPaths() {
 const { tag, posts } = Astro.props;
 ---
 
-<BaseLayout
+<SiteLayout
   title={`#${tag}`}
   description={`All posts tagged with "${tag}" on westtech.dev`}
 >
-  <Header />
+  <div class="flex items-center gap-3 mb-8">
+    <a
+      href="/tags"
+      class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+    >
+      ← All tags
+    </a>
+    <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+      #{tag}
+    </h1>
+    <span class="text-sm text-zinc-400 dark:text-zinc-500">
+      {posts.length} post{posts.length !== 1 ? "s" : ""}
+    </span>
+  </div>
 
-  <main class="flex-1 w-full max-w-2xl lg:max-w-4xl mx-auto px-4 sm:px-6 py-10">
-    <div class="flex items-center gap-3 mb-8">
-      <a
-        href="/tags"
-        class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-      >
-        ← All tags
-      </a>
-      <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        #{tag}
-      </h1>
-      <span class="text-sm text-zinc-400 dark:text-zinc-500">
-        {posts.length} post{posts.length !== 1 ? "s" : ""}
-      </span>
-    </div>
-
-    {
-      posts.map((post) => (
-        <PostCard
-          title={post.data.title}
-          date={post.data.date}
-          description={post.data.description}
-          tags={post.data.tags}
-          slug={post.id}
-        />
-      ))
-    }
-  </main>
-
-  <Footer />
-</BaseLayout>
+  {
+    posts.map((post) => (
+      <PostCard
+        title={post.data.title}
+        date={post.data.created}
+        description={post.data.description}
+        tags={post.data.tags}
+        slug={post.id}
+      />
+    ))
+  }
+</SiteLayout>

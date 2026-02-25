@@ -1,6 +1,6 @@
 ---
 title: "Troubleshoot Certificate Revocation Lookups"
-date: 2023-01-31
+created: 2023-01-31
 description: "Intermittent SSL errors on outbound service calls traced back to blocked LetsEncrypt revocation check domains."
 tags: ["security", "certificates", "networking"]
 draft: false

@@ -1,6 +1,6 @@
 ---
 title: "SXA Search Endpoint Validation"
-date: 2023-07-05
+created: 2023-07-05
 description: "Invalid query strings hitting SXA search endpoints generate thousands of log exceptions. Here's how to stop the noise."
 tags: ["sitecore", "security", "sxa"]
 draft: false

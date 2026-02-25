@@ -1,21 +1,13 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 ---
 
-<BaseLayout title="Search" description="Search all posts on westtech.dev">
-  <Header />
+<SiteLayout title="Search" description="Search all posts on westtech.dev">
+  <h1 class="text-2xl font-bold mb-6 text-zinc-900 dark:text-zinc-50">Search</h1>
 
-  <main class="flex-1 w-full max-w-2xl lg:max-w-4xl mx-auto px-4 sm:px-6 py-10">
-    <h1 class="text-2xl font-bold mb-6 text-zinc-900 dark:text-zinc-50">Search</h1>
-
-    <!-- Pagefind UI -->
-    <div id="search"></div>
-  </main>
-
-  <Footer />
-</BaseLayout>
+  <!-- Pagefind UI -->
+  <div id="search"></div>
+</SiteLayout>
 
 <!-- Pagefind UI assets (generated at build time) -->
 <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />

@@ -1,0 +1,33 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Sidebar from "../components/Sidebar.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+}
+
+const { title, description, canonicalUrl, ogImage } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} canonicalUrl={canonicalUrl} ogImage={ogImage}>
+  <Header />
+
+  <div class="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 items-start">
+      <main>
+        <slot />
+      </main>
+
+      <aside class="lg:sticky lg:top-6">
+        <Sidebar />
+      </aside>
+    </div>
+  </div>
+
+  <Footer />
+</BaseLayout>

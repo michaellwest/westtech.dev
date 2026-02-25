@@ -1,13 +1,9 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 ---
 
-<BaseLayout title="404 — Page Not Found">
-  <Header />
-
-  <main class="flex-1 w-full max-w-2xl lg:max-w-4xl mx-auto px-4 sm:px-6 py-20 text-center">
+<SiteLayout title="404 — Page Not Found">
+  <div class="py-10 text-center">
     <p class="text-6xl font-mono font-bold text-zinc-200 dark:text-zinc-800 mb-4">404</p>
     <h1 class="text-2xl font-semibold text-zinc-900 dark:text-zinc-50 mb-3">Page not found</h1>
     <p class="text-zinc-500 dark:text-zinc-400 mb-8">
@@ -19,7 +15,5 @@ import Footer from "../components/Footer.astro";
     >
       Back to all posts
     </a>
-  </main>
-
-  <Footer />
-</BaseLayout>
+  </div>
+</SiteLayout>

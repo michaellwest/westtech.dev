@@ -1,6 +1,6 @@
 ---
 title: "Hotfix Wiped Out My Roles"
-date: 2022-11-29
+created: 2022-11-29
 description: "A Sitecore 10.2.1 cumulative hotfix changed how federated authentication handles roles at sign-in — and took our users' permissions with it."
 tags: ["sitecore", "authentication", "identity"]
 draft: false

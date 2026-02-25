@@ -53,6 +53,8 @@ The rules we implemented target only the `/sxa/search/` path and validate that:
 (not http.request.uri.query matches "^l=[a-zA-Z]{2}(-[a-zA-Z]{2})?(&|$)")
 ```
 
+![Cloudflare WAF rule blocking malformed SXA search requests](/images/posts/sxa-search-endpoint-validation/snag-0464.png)
+
 Block, not just challenge. These aren't real users.
 
 ## Takeaway

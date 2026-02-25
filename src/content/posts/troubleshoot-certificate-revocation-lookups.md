@@ -8,6 +8,8 @@ draft: false
 
 In this article we investigate an intermittent SSL failure that had nothing to do with the certificate itself.
 
+![LetsEncrypt Logo](/images/posts/troubleshoot-certificate-revocation-lookups/letsencrypt-logo.png)
+
 ## The error
 
 A non-production environment started throwing errors when a custom contact form built on Sitecore MVC attempted to POST to an external service hosted by another team. The full exception logged in the Sitecore log files looked like this:
@@ -45,6 +47,12 @@ certutil.exe -verify -urlfetch "$pwd\company.cer"
 The output showed repeated attempts to reach domains under `lencr.org` — the domain LetsEncrypt uses for Online Certificate Status Protocol (OCSP) and CRL distribution point lookups. .NET validates the certificate chain on every outbound HTTPS call, which includes checking whether the certificate has been revoked.
 
 If those revocation check domains are unreachable — blocked by a firewall, a restrictive egress policy, or a proxy with no rule covering them — .NET treats the check as a failure and the call dies.
+
+![certutil output showing lencr.org access attempt](/images/posts/troubleshoot-certificate-revocation-lookups/snag-0221.png)
+
+![certutil output showing lencr.org domain blocked](/images/posts/troubleshoot-certificate-revocation-lookups/snag-0220.png)
+
+![certutil final error message](/images/posts/troubleshoot-certificate-revocation-lookups/snag-0222.png)
 
 ## The fix
 

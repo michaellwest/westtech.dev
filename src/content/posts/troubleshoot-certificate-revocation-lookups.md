@@ -4,6 +4,8 @@ created: 2023-01-31
 description: "Intermittent SSL errors on outbound service calls traced back to blocked LetsEncrypt revocation check domains."
 tags: ["security", "certificates", "networking"]
 draft: false
+source: "https://michaellwest.blogspot.com/2023/01/troubleshoot-certificate-revocation.html"
+migrated: true
 ---
 
 In this article we investigate an intermittent SSL failure that had nothing to do with the certificate itself.

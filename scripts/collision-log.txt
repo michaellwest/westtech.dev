@@ -1,0 +1,6 @@
+COLLISION: clean-orphaned-blob-records  ←  /2025/05/clean-orphaned-blob-records.html
+COLLISION: troubleshoot-certificate-revocation-lookups  ←  /2023/01/troubleshoot-certificate-revocation.html
+COLLISION: replacement-task-scheduler-for-sitecore  ←  /2022/08/replacement-task-scheduler-for-sitecore.html
+COLLISION: working-with-unicorn-and-sitecore-cli  ←  /2023/01/working-with-unicorn-and-sitecore-cli.html
+COLLISION: sxa-search-endpoint-validation  ←  /2023/07/sxa-search-endpoint-validation.html
+COLLISION: hotfix-wiped-out-my-roles  ←  /2022/11/hotfix-wiped-out-my-roles.html

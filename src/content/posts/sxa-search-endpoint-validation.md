@@ -4,6 +4,8 @@ created: 2023-07-05
 description: "Invalid query strings hitting SXA search endpoints generate thousands of log exceptions. Here's how to stop the noise."
 tags: ["sitecore", "security", "sxa"]
 draft: false
+source: "https://michaellwest.blogspot.com/2023/07/sxa-search-endpoint-validation.html"
+migrated: true
 ---
 
 Today we look at a noisy problem that shows up in security scan windows — invalid requests hammering SXA search endpoints and flooding your logs with exceptions.

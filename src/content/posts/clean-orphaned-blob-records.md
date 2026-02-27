@@ -4,6 +4,8 @@ created: 2025-05-10
 description: "Over 60% of a Sitecore database consumed by orphaned blob records — here's what we found and how we fixed it."
 tags: ["sitecore", "database"]
 draft: false
+source: "https://michaellwest.blogspot.com/2025/05/clean-orphaned-blob-records.html"
+migrated: true
 ---
 
 Today we explore some of the challenges with ignoring maintenance of your Sitecore installation.

@@ -8,9 +8,11 @@ interface Props {
   updated?: Date;
   description: string;
   tags: string[];
+  source?: string;
+  migrated?: boolean;
 }
 
-const { title, created, updated, description, tags } = Astro.props;
+const { title, created, updated, description, tags, source, migrated } = Astro.props;
 
 const formatDate = (d: Date) =>
   d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
@@ -44,6 +46,17 @@ const formatDate = (d: Date) =>
         }
       </div>
     </header>
+
+    {
+      migrated && source && (
+        <p class="migrated-notice">
+          Originally published on{' '}
+          <a href={source} rel="noopener noreferrer">
+            michaellwest.blogspot.com
+          </a>
+        </p>
+      )
+    }
 
     <!-- Prose styles for rendered Markdown -->
     <div class="prose-styles">
@@ -98,6 +111,12 @@ const formatDate = (d: Date) =>
   }
   .prose-styles :global(img) {
     @apply rounded-lg my-6 max-w-full;
+  }
+  .migrated-notice {
+    @apply text-xs text-zinc-400 dark:text-zinc-500 mb-6;
+  }
+  .migrated-notice :global(a) {
+    @apply text-zinc-400 dark:text-zinc-500 underline hover:text-zinc-600 dark:hover:text-zinc-400;
   }
   .prose-styles :global(table) {
     @apply w-full text-sm border-collapse my-4;

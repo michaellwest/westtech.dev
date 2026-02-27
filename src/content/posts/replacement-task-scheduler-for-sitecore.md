@@ -4,6 +4,8 @@ created: 2022-08-27
 description: "Sitecore's built-in task scheduler has some well-known limitations. Here's how we replaced it with Hangfire for more reliable background job scheduling."
 tags: ["sitecore", "dotnet", "hangfire"]
 draft: false
+source: "https://michaellwest.blogspot.com/2022/08/replacement-task-scheduler-for-sitecore.html"
+migrated: true
 ---
 
 In this article we discuss some of the challenges with the out-of-the-box Task Scheduler included with Sitecore and see how you can replace it with [Hangfire](https://www.hangfire.io/), a product to perform background processing for .Net applications.

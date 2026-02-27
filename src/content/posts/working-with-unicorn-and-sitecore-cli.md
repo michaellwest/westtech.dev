@@ -4,6 +4,8 @@ created: 2023-01-16
 description: "Running Unicorn and Sitecore CLI side-by-side during a staged migration surfaces some subtle compatibility problems worth knowing about."
 tags: ["sitecore", "serialization", "unicorn", "sitecore-cli"]
 draft: false
+source: "https://michaellwest.blogspot.com/2023/01/working-with-unicorn-and-sitecore-cli.html"
+migrated: true
 ---
 
 Today we explore what happens when you try to run Unicorn and Sitecore CLI at the same time during a staged migration.

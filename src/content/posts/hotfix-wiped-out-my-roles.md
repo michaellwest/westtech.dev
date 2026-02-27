@@ -4,6 +4,8 @@ created: 2022-11-29
 description: "A Sitecore 10.2.1 cumulative hotfix changed how federated authentication handles roles at sign-in — and took our users' permissions with it."
 tags: ["sitecore", "authentication", "identity"]
 draft: false
+source: "https://michaellwest.blogspot.com/2022/11/hotfix-wiped-out-my-roles.html"
+migrated: true
 ---
 
 In this article we will see how the Default Identity Provider used with Identity Server learned a new behavior with role management when resolving users on sign in. This impacts Sitecore 10.2 when the cumulative hotfix 10.2.1 is installed.

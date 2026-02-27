@@ -24,3 +24,7 @@ Thumbs.db
 .wrangler
 .dev.vars*
 !.dev.vars.example
+
+# Blogspot migration — raw export files (contain unprocessed HTML, no need to ship)
+scripts/blog-export.xml
+scripts/redirects-map.json

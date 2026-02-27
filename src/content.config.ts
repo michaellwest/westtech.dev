@@ -10,6 +10,8 @@ const posts = defineCollection({
     description: z.string(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
+    source: z.string().url().optional(),
+    migrated: z.boolean().optional(),
   }),
 });
 

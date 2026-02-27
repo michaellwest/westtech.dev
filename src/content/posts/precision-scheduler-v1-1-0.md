@@ -1,8 +1,8 @@
 ---
 title: "PrecisionScheduler v1.1.0: Fixing the Bugs That Hurt in Production"
-date: 2026-02-25
+created: 2026-02-25
+description: "Real-world use surfaced six issues in PrecisionScheduler — some cosmetic, some quietly catastrophic — here's what changed in v1.1.0 and why."
 tags: [sitecore, dotnet, hangfire]
-summary: "Real-world use surfaced six issues in PrecisionScheduler — some cosmetic, some quietly catastrophic — here's what changed in v1.1.0 and why."
 draft: false
 ---
 

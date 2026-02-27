@@ -2,7 +2,7 @@
 title: "SXA Theme Upgrade Tip using SPE"
 created: "2018-02-01"
 description: "In some recent conversations on Sitecore Slack Chat I needed to determine why a component script in SXA was not working as desired (broke)."
-tags: []
+tags: ["powershell", "sitecore", "sxa"]
 source: "https://michaellwest.blogspot.com/2018/02/sxa-theme-upgrade-tip-using-spe.html"
 migrated: true
 ---

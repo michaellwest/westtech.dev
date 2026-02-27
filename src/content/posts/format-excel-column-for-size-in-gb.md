@@ -2,7 +2,7 @@
 title: "Format Excel Column for Size in GB"
 created: "2014-02-05"
 description: "Today I was doing some reporting on file sizes and saw that I had columns with data in bytes."
-tags: []
+tags: ["powershell"]
 source: "https://michaellwest.blogspot.com/2014/02/format-excel-column-for-size-in-gb.html"
 migrated: true
 ---

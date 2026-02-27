@@ -2,7 +2,7 @@
 title: "Sitecore PowerShell Extensions June Release"
 created: "2015-06-13"
 description: "It's already June and been way too long since I last sat down to collect my thoughts."
-tags: []
+tags: ["powershell", "sitecore"]
 draft: true
 source: "https://michaellwest.blogspot.com/2015/06/sitecore-powershell-extensions-june-release.html"
 migrated: true

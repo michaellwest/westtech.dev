@@ -3,7 +3,7 @@ title: "Scripting Games 2013 Advanced Event 2 - My Submission"
 created: "2013-05-07"
 updated: "2013-05-09"
 description: "If you have not already, I highly recommend you work on the events for the Scripting Games ."
-tags: []
+tags: ["powershell"]
 source: "https://michaellwest.blogspot.com/2013/05/scripting-games-2013-advanced-event-2.html"
 migrated: true
 ---

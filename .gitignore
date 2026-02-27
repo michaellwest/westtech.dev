@@ -20,6 +20,9 @@ Thumbs.db
 # Editor
 .vscode/settings.json
 
+# Claude Code — local permissions (machine-specific paths, not for team/CI)
+.claude/settings.local.json
+
 # wrangler files
 .wrangler
 .dev.vars*

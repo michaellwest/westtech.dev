@@ -1,8 +1,8 @@
 ---
 title: "PrecisionScheduler v1.1.0: Fixing the Bugs That Hurt in Production"
-created: 2026-02-25
-description: "Six issues closed, one breaking config rename, and a completely rethought missed-run detection — here's what changed in PrecisionScheduler v1.1.0 and why."
-tags: ["sitecore", "dotnet", "hangfire"]
+date: 2026-02-25
+tags: [sitecore, dotnet, hangfire]
+summary: "Real-world use surfaced six issues in PrecisionScheduler — some cosmetic, some quietly catastrophic — here's what changed in v1.1.0 and why."
 draft: false
 ---
 
@@ -101,7 +101,7 @@ Two new config properties control this behaviour:
 | `StartupCatchUpEnabled` | `true` | Master switch. Set to `false` to disable all startup catch-up logic. |
 | `MissedJobLookbackDays` | `30` | How far back to look for missed daily+ jobs. |
 
-## Upgrading from v1.0.0
+## The one breaking change
 
 There is one breaking change: the `MisfireBehavior` config property has been renamed to `RefreshMisfireBehavior` to make its scope clearer (it governs what happens when the Hangfire refresh job itself misfires, not when a scheduled task misfires).
 
@@ -129,7 +129,7 @@ The full updated configuration reference:
 </processor>
 ```
 
-## Validating your install
+## Checking it actually worked
 
 The integration test plan added in issue #8 covers what to check after deploying. At minimum:
 
@@ -139,3 +139,5 @@ The integration test plan added in issue #8 covers what to check after deploying
 4. Set the schedule field on a test item to an invalid value and confirm a WARN entry appears with the item path.
 
 The [full test checklist is in the repository](https://github.com/michaellwest/PrecisionScheduler).
+
+If you run into anything the test checklist doesn't cover, feedback is welcome.

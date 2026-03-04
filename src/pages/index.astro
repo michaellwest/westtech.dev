@@ -7,23 +7,177 @@ const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 const posts = allPosts.sort(
   (a, b) => b.data.created.getTime() - a.data.created.getTime()
 );
+
+// Build tag → count map, sorted alphabetically
+const tagMap = new Map<string, number>();
+for (const post of posts) {
+  for (const tag of post.data.tags) {
+    tagMap.set(tag, (tagMap.get(tag) ?? 0) + 1);
+  }
+}
+const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 ---
 
 <SiteLayout title="westtech.dev">
   <h1 class="sr-only">westtech.dev — all posts</h1>
-  {
-    posts.length === 0 ? (
-      <p class="text-zinc-500 dark:text-zinc-400">No posts yet. Check back soon.</p>
-    ) : (
-      posts.map((post) => (
-        <PostCard
-          title={post.data.title}
-          date={post.data.created}
-          description={post.data.description}
-          tags={post.data.tags}
-          slug={post.id}
-        />
-      ))
-    )
-  }
+
+  <!-- Search section -->
+  <section class="border-b border-zinc-100 dark:border-zinc-800 pb-6 mb-6">
+    <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">Search</p>
+    <div id="search"></div>
+  </section>
+
+  <!-- Tag cloud section -->
+  <section class="border-b border-zinc-100 dark:border-zinc-800 pb-6 mb-6">
+    <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">Filter by tag</p>
+    <div class="flex flex-wrap gap-2" id="tag-cloud">
+      <button
+        data-tag=""
+        class="tag-btn px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors cursor-pointer"
+      >
+        All
+      </button>
+      {tags.map(([tag, count]) => {
+        const slug = tag.toLowerCase().replace(/\s+/g, "-");
+        return (
+          <button
+            data-tag={slug}
+            class="tag-btn px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors cursor-pointer"
+          >
+            {tag}
+            <span class="ml-1 text-zinc-400 dark:text-zinc-500">{count}</span>
+          </button>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- Post list -->
+  <section>
+    {
+      posts.length === 0 ? (
+        <p class="text-zinc-500 dark:text-zinc-400">No posts yet. Check back soon.</p>
+      ) : (
+        <ul id="post-list">
+          {posts.map((post) => {
+            const tagSlugs = post.data.tags
+              .map((t) => t.toLowerCase().replace(/\s+/g, "-"))
+              .join(",");
+            return (
+              <li data-tags={tagSlugs}>
+                <PostCard
+                  title={post.data.title}
+                  date={post.data.created}
+                  description={post.data.description}
+                  tags={post.data.tags}
+                  slug={post.id}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )
+    }
+  </section>
 </SiteLayout>
+
+<!-- Pagefind UI assets (generated at build time) -->
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+<script src="/pagefind/pagefind-ui.js" is:inline></script>
+<script is:inline>
+  window.addEventListener("DOMContentLoaded", () => {
+    new PagefindUI({
+      element: "#search",
+      showSubResults: true,
+      resetStyles: true,
+    });
+  });
+</script>
+
+<script is:inline>
+  (function () {
+    function getActiveTag() {
+      return new URLSearchParams(window.location.search).get("tag") || "";
+    }
+
+    function applyFilter(activeTag) {
+      const items = document.querySelectorAll("#post-list li");
+      items.forEach((li) => {
+        if (!activeTag) {
+          li.style.display = "";
+          return;
+        }
+        const tags = (li.getAttribute("data-tags") || "").split(",");
+        li.style.display = tags.includes(activeTag) ? "" : "none";
+      });
+
+      document.querySelectorAll(".tag-btn").forEach((btn) => {
+        const btnTag = btn.getAttribute("data-tag");
+        if (btnTag === activeTag) {
+          btn.classList.add(
+            "bg-blue-100",
+            "dark:bg-blue-900/30",
+            "text-blue-700",
+            "dark:text-blue-400",
+            "font-semibold"
+          );
+          btn.classList.remove("text-zinc-600", "dark:text-zinc-300");
+        } else {
+          btn.classList.remove(
+            "bg-blue-100",
+            "dark:bg-blue-900/30",
+            "text-blue-700",
+            "dark:text-blue-400",
+            "font-semibold"
+          );
+          btn.classList.add("text-zinc-600", "dark:text-zinc-300");
+        }
+      });
+    }
+
+    function init() {
+      applyFilter(getActiveTag());
+
+      document.querySelectorAll(".tag-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const newTag = btn.getAttribute("data-tag") || "";
+          const url = newTag ? "/?tag=" + encodeURIComponent(newTag) : "/";
+          history.pushState({}, "", url);
+          applyFilter(newTag);
+        });
+      });
+
+      window.addEventListener("popstate", () => {
+        applyFilter(getActiveTag());
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+<style>
+  /* Pagefind palette overrides */
+  :root {
+    --pagefind-ui-scale: 0.9;
+    --pagefind-ui-primary: #2563eb;
+    --pagefind-ui-text: #18181b;
+    --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: #e4e4e7;
+    --pagefind-ui-tag: #f4f4f5;
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 6px;
+    --pagefind-ui-font: system-ui, sans-serif;
+  }
+
+  html.dark {
+    --pagefind-ui-text: #f4f4f5;
+    --pagefind-ui-background: #09090b;
+    --pagefind-ui-border: #27272a;
+    --pagefind-ui-tag: #27272a;
+  }
+</style>

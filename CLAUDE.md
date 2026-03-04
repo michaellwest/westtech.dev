@@ -135,6 +135,5 @@ When drafting blog posts, follow the author's voice profile in `.claude/VOICE_PR
 
 - **Search only works in production builds.** Pagefind generates its index during `npm run build`. The dev server won't have search functionality.
 - **No tags or search pages.** Tags and search are on the home page (`index.astro`), not separate routes.
-- **Migration devDependencies remain.** `fast-xml-parser`, `slugify`, and `turndown` in `package.json` devDependencies were used by the now-deleted migration script and can be removed when convenient.
 - **Cloudflare adapter.** The site uses `@astrojs/cloudflare`, not pure static output. Pages deploy via `wrangler`.
 - **Content loader.** Posts use `glob()` loader, not the filesystem loader — defined in `src/content.config.ts` (not `src/content/config.ts`).

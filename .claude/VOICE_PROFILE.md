@@ -1,6 +1,6 @@
 # Michael West — Voice Profile & Blog Post Guide
 
-Drop this file into the westtech project repo. When writing a new post, share this file with Claude alongside your brain dump or rough notes.
+Claude reads this file automatically from the repo. When writing a new post, share your brain dump or rough notes and ask for a draft.
 
 ---
 
@@ -91,18 +91,21 @@ Examples:
 
 ## Frontmatter Format (for westtech.dev)
 
-Posts appear to use a date + tag structure. When producing a post, include a frontmatter block:
+Schema is defined in `src/content.config.ts`. When producing a post, include this frontmatter block:
 
 ```yaml
 ---
 title: "Post Title Here"
-date: YYYY-MM-DD
+created: YYYY-MM-DD
+description: "One-sentence summary for post cards and SEO."
 tags: [sitecore, dotnet, security] # use lowercase, use existing tags where possible
-summary: "One-sentence index summary."
+draft: false                       # omit or set true to hide from the public site
 ---
 ```
 
-Common existing tags: `sitecore`, `dotnet`, `hangfire`, `database`, `security`, `sxa`, `certificates`, `networking`, `serialization`, `unicorn`, `sitecore-cli`, `authentication`, `identity`, `docker`
+Optional fields: `updated` (date), `source` (original URL for migrated posts), `migrated` (boolean).
+
+Common existing tags: `sitecore`, `dotnet`, `hangfire`, `database`, `security`, `sxa`, `certificates`, `networking`, `serialization`, `unicorn`, `sitecore-cli`, `authentication`, `identity`, `docker`, `powershell`, `active-directory`
 
 ---
 

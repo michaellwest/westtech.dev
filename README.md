@@ -30,6 +30,7 @@ Run the helper script from the repo root:
 ```
 
 It will prompt you for:
+
 - **Title** — used as the heading and to generate the URL slug
 - **Tags** — comma-separated (e.g. `sitecore, dotnet`)
 - **Description** — one sentence for SEO and post cards
@@ -44,7 +45,7 @@ title: "Your Post Title"
 date: 2025-01-15
 description: "One sentence summary shown in post cards and search results."
 tags: ["sitecore", "dotnet"]
-draft: false        # set to true to hide from the public site
+draft: false # set to true to hide from the public site
 ---
 ```
 
@@ -61,6 +62,7 @@ draft: false        # set to true to hide from the public site
 ```
 
 It will:
+
 - Ask which post to attach the image to (defaults to the most recently modified post)
 - Ask for a short description (used as the filename and alt text)
 - Save the image to `public/images/posts/[post-slug]/descriptive-name.png`
@@ -77,40 +79,6 @@ Then just paste into your post:
 ## Tags
 
 Tags are defined in post frontmatter — no separate config needed. New tags appear automatically on the `/tags` page. Keep them lowercase with hyphens (e.g. `sitecore-cli`, `dotnet`, `docker`).
-
----
-
-## Deploying to Cloudflare Pages
-
-### First-time setup
-
-1. Push this repo to GitHub
-2. Log in to [Cloudflare Pages](https://pages.cloudflare.com)
-3. Click **Create a project** → **Connect to Git** → select this repo
-4. Set the build settings:
-
-   | Setting | Value |
-   |---|---|
-   | Framework preset | None |
-   | Build command | `npm run build` |
-   | Build output directory | `dist` |
-   | Node.js version | `20` |
-
-5. Click **Save and Deploy**
-
-After the first deploy, every push to `main` triggers an automatic redeploy.
-
-### Custom domain
-
-In the Cloudflare Pages dashboard → your project → **Custom domains** → add `westtech.dev`. Cloudflare handles the DNS automatically if your domain is already on Cloudflare.
-
-### Analytics
-
-The site includes the Cloudflare Web Analytics beacon. To activate it:
-
-1. Go to **Cloudflare Dashboard** → **Web Analytics** → **Add a site**
-2. Copy your token
-3. Open `src/layouts/BaseLayout.astro` and replace `REPLACE_WITH_YOUR_CF_TOKEN` with your token
 
 ---
 

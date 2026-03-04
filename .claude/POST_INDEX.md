@@ -2,7 +2,7 @@
 
 Canonical index of all posts on westtech.dev. Claude reads this file to avoid duplication, maintain tag consistency, and recall prior topics when drafting new posts.
 
-**Total posts:** 89 (88 migrated from Blogspot + 1 native)
+**Total posts:** 90 (88 migrated from Blogspot + 2 native)
 **Last updated:** 2026-03-04
 
 ---
@@ -15,6 +15,7 @@ Sorted by date. All posts live in `src/content/posts/`.
 
 | Slug | Title | Date | Tags |
 |---|---|---|---|
+| certz-0-4-certificate-management-utility | Certz 0.4: A Certificate Management Utility | 2026-03-04 | certificates, dotnet, powershell |
 | precision-scheduler-v1-1-0 | PrecisionScheduler v1.1.0: Fixing the Bugs That Hurt in Production | 2026-02-25 | sitecore, dotnet, hangfire |
 
 ### 2025
@@ -182,6 +183,9 @@ Quick reference for what has already been covered. Helps avoid duplication and f
 **Sitecore SXA**
 - **sxa-search-endpoint-validation** (2023-07-05) — Invalid query strings generating thousands of log exceptions. Solution: endpoint input validation.
 
+**Developer Tools**
+- **certz-0-4-certificate-management-utility** (2026-03-04) — Introduction to Certz, a cross-platform certificate management CLI. Version 0.4 adds diff, fingerprint, Linux trust stores, shell completion, EKU selection, dry-run, verbose output, and CI/CD improvements.
+
 **Security & Infrastructure**
 - **troubleshoot-certificate-revocation-lookups** (2023-01-31) — Intermittent SSL errors on outbound calls traced to blocked Let's Encrypt OCSP/CRL endpoints.
 - **working-with-unicorn-and-sitecore-cli** (2023-01-16) — Compatibility issues running Unicorn and Sitecore CLI side-by-side during staged migration.
@@ -195,15 +199,15 @@ Prefer existing tags when tagging new posts.
 | Tag | Count | Notes |
 |---|---|---|
 | sitecore | 58 | Primary topic |
-| powershell | 53 | SPE and general PowerShell |
-| dotnet | 2 | .NET / C# content |
+| powershell | 54 | SPE and general PowerShell |
+| dotnet | 3 | .NET / C# content |
 | hangfire | 2 | Background job scheduling |
 | security | 2 | Security hardening |
 | sxa | 2 | Sitecore Experience Accelerator |
 | docker | 2 | Container/Docker |
 | authentication | 1 | Auth flows |
 | bits | 1 | BITS download |
-| certificates | 1 | SSL/TLS |
+| certificates | 2 | SSL/TLS |
 | database | 1 | SQL Server / Sitecore DB |
 | identity | 1 | Sitecore Identity Server |
 | networking | 1 | Network-level issues |

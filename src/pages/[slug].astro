@@ -12,6 +12,7 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+const ogImage = new URL(`/og/${post.id}.png`, Astro.site).href;
 ---
 
 <PostLayout
@@ -22,6 +23,9 @@ const { Content } = await render(post);
   tags={post.data.tags}
   source={post.data.source}
   migrated={post.data.migrated}
+  heroImage={post.data.heroImage}
+  slug={post.id}
+  ogImage={ogImage}
 >
   <Content />
 </PostLayout>

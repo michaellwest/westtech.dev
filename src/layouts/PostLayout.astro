@@ -10,16 +10,27 @@ interface Props {
   tags: string[];
   source?: string;
   migrated?: boolean;
+  heroImage?: boolean;
+  slug?: string;
+  ogImage?: string;
 }
 
-const { title, created, updated, description, tags, source, migrated } = Astro.props;
+const { title, created, updated, description, tags, source, migrated, heroImage, slug, ogImage } = Astro.props;
 
 const formatDate = (d: Date) =>
   d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 ---
 
-<SiteLayout title={title} description={description}>
+<SiteLayout title={title} description={description} ogImage={ogImage}>
   <article>
+    {heroImage && slug && (
+      <img
+        src={`/og/${slug}.png`}
+        alt=""
+        class="w-full rounded-lg mb-8"
+        loading="eager"
+      />
+    )}
     <header class="mb-8">
       <div class="flex flex-wrap gap-2 mb-3">
         {tags.map((tag) => <TagPill tag={tag} />)}

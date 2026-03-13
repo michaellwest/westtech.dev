@@ -12,6 +12,7 @@ const posts = defineCollection({
     draft: z.boolean().default(false),
     source: z.string().url().optional(),
     migrated: z.boolean().optional(),
+    heroImage: z.boolean().default(true),
   }),
 });
 

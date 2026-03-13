@@ -8,6 +8,9 @@ dist/
 # Pagefind index (generated at build time)
 public/pagefind/
 
+# OG images (generated at build time)
+public/og/
+
 # Environment
 .env
 .env.*

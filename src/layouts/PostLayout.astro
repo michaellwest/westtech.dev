@@ -10,7 +10,7 @@ interface Props {
   tags: string[];
   source?: string;
   migrated?: boolean;
-  heroImage?: boolean;
+  heroImage?: boolean | string;
   slug?: string;
   ogImage?: string;
 }
@@ -23,7 +23,15 @@ const formatDate = (d: Date) =>
 
 <SiteLayout title={title} description={description} ogImage={ogImage}>
   <article>
-    {heroImage && slug && (
+    {typeof heroImage === "string" && (
+      <img
+        src={heroImage}
+        alt=""
+        class="w-full rounded-lg mb-8"
+        loading="eager"
+      />
+    )}
+    {heroImage === true && slug && (
       <img
         src={`/og/${slug}.png`}
         alt=""
@@ -137,5 +145,15 @@ const formatDate = (d: Date) =>
   }
   .prose-styles :global(td) {
     @apply border border-zinc-200 dark:border-zinc-700 px-3 py-2;
+  }
+  .prose-styles :global(.mermaid-block),
+  .prose-styles :global(pre.mermaid) {
+    @apply flex justify-center my-6;
+    background: transparent;
+  }
+  .prose-styles :global(.mermaid-block img),
+  .prose-styles :global(.mermaid-block svg) {
+    @apply max-w-full;
+    max-width: 720px;
   }
 </style>

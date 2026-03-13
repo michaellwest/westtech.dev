@@ -1,40 +1,61 @@
 import satori from "satori";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { getTagIconUri } from "./tag-icons";
+import { readFileSync, readdirSync, mkdirSync, writeFileSync, statSync } from "node:fs";
+import { join, basename } from "node:path";
 
-const fontsDir = join(process.cwd(), "src/assets/fonts");
+const projectRoot = process.cwd();
+const fontsDir = join(projectRoot, "src/assets/fonts");
+const iconsDir = join(projectRoot, "src/assets/icons");
+const postsDir = join(projectRoot, "src/content/posts");
+const outDir = join(projectRoot, "public/og");
 
+// Load fonts
 const interBold = readFileSync(join(fontsDir, "Inter-Bold.woff"));
 const interRegular = readFileSync(join(fontsDir, "Inter-Regular.woff"));
 
-let wasmInitialized = false;
+const wasmPath = join(projectRoot, "node_modules/@resvg/resvg-wasm/index_bg.wasm");
 
-async function ensureWasm() {
-  if (wasmInitialized) return;
-  const wasmPath = join(
-    process.cwd(),
-    "node_modules/@resvg/resvg-wasm/index_bg.wasm",
-  );
-  const wasmBuffer = readFileSync(wasmPath);
-  await initWasm(wasmBuffer);
-  wasmInitialized = true;
+// Tag icon helper
+const iconCache = new Map();
+function getTagIconUri(tag) {
+  if (iconCache.has(tag)) return iconCache.get(tag);
+  try {
+    const svg = readFileSync(join(iconsDir, `${tag}.svg`), "utf-8");
+    const uri = `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+    iconCache.set(tag, uri);
+    return uri;
+  } catch {
+    return undefined;
+  }
 }
 
-interface OgImageOptions {
-  title: string;
-  description: string;
-  tags: string[];
+// Frontmatter parser
+function parseFrontmatter(content) {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return null;
+  const yaml = match[1];
+
+  const get = (key) => {
+    const m = yaml.match(new RegExp(`^${key}:\\s*(.+)$`, "m"));
+    return m ? m[1].trim().replace(/^["']|["']$/g, "") : undefined;
+  };
+
+  const tagsMatch = yaml.match(/^tags:\s*\[([^\]]*)\]/m);
+  const tags = tagsMatch
+    ? tagsMatch[1].split(",").map((t) => t.trim().replace(/^["']|["']$/g, "")).filter(Boolean)
+    : [];
+
+  return {
+    title: get("title") || "",
+    description: get("description") || "",
+    tags,
+    draft: get("draft") === "true",
+    heroImage: get("heroImage"),
+  };
 }
 
-export async function renderOgImage({
-  title,
-  description,
-  tags,
-}: OgImageOptions): Promise<Uint8Array> {
-  await ensureWasm();
-
+// OG image renderer
+async function renderOgImage({ title, description, tags }) {
   const displayTags = tags.slice(0, 4);
 
   const svg = await satori(
@@ -50,7 +71,6 @@ export async function renderOgImage({
           padding: "60px",
         },
         children: [
-          // Top accent bar
           {
             type: "div",
             props: {
@@ -64,14 +84,13 @@ export async function renderOgImage({
               },
             },
           },
-          // Tags row
           displayTags.length > 0
             ? {
                 type: "div",
                 props: {
                   style: {
                     display: "flex",
-                    flexWrap: "wrap" as const,
+                    flexWrap: "wrap",
                     gap: "8px",
                     marginBottom: "24px",
                   },
@@ -96,11 +115,7 @@ export async function renderOgImage({
                           iconUri
                             ? {
                                 type: "img",
-                                props: {
-                                  src: iconUri,
-                                  width: 16,
-                                  height: 16,
-                                },
+                                props: { src: iconUri, width: 16, height: 16 },
                               }
                             : null,
                           tag,
@@ -111,7 +126,6 @@ export async function renderOgImage({
                 },
               }
             : null,
-          // Title
           {
             type: "div",
             props: {
@@ -128,7 +142,6 @@ export async function renderOgImage({
               children: title,
             },
           },
-          // Description
           {
             type: "div",
             props: {
@@ -145,7 +158,6 @@ export async function renderOgImage({
               children: description,
             },
           },
-          // Bottom branding
           {
             type: "div",
             props: {
@@ -202,3 +214,52 @@ export async function renderOgImage({
 
   return resvg.render().asPng();
 }
+
+// Main
+mkdirSync(outDir, { recursive: true });
+
+const files = readdirSync(postsDir).filter((f) => f.endsWith(".md"));
+
+let generated = 0;
+let skipped = 0;
+let wasmReady = false;
+
+for (const file of files) {
+  const slug = basename(file, ".md");
+  const content = readFileSync(join(postsDir, file), "utf-8");
+  const fm = parseFrontmatter(content);
+  if (!fm || fm.draft) continue;
+  // Skip posts with custom hero image URL (they use that as og:image)
+  if (fm.heroImage && fm.heroImage !== "true" && fm.heroImage !== "false") continue;
+
+  const outPath = join(outDir, `${slug}.png`);
+  const mdPath = join(postsDir, file);
+
+  // Skip if OG image already exists and is newer than the source post
+  try {
+    const ogStat = statSync(outPath);
+    const mdStat = statSync(mdPath);
+    if (ogStat.mtimeMs >= mdStat.mtimeMs) {
+      skipped++;
+      continue;
+    }
+  } catch {
+    // File doesn't exist, generate it
+  }
+
+  // Lazy-init WASM on first image that needs generating
+  if (!wasmReady) {
+    await initWasm(readFileSync(wasmPath));
+    wasmReady = true;
+  }
+
+  const png = await renderOgImage({
+    title: fm.title,
+    description: fm.description,
+    tags: fm.tags,
+  });
+  writeFileSync(outPath, png);
+  generated++;
+}
+
+console.log(`OG images: ${generated} generated, ${skipped} up-to-date.`);

@@ -21,7 +21,7 @@ Here is something that I've been trying to setup as part of our deployment proce
 
   
 
-```disabled
+```xml
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +46,7 @@ Here is something that I've been trying to setup as part of our deployment proce
 
 ```
 
-```disabled
+```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
     <system.web>

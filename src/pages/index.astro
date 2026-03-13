@@ -79,20 +79,20 @@ const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
       )
     }
   </section>
-</SiteLayout>
 
-<!-- Pagefind UI assets (generated at build time) -->
-<link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
-<script src="/pagefind/pagefind-ui.js" is:inline></script>
-<script is:inline>
-  window.addEventListener("DOMContentLoaded", () => {
-    new PagefindUI({
-      element: "#search",
-      showSubResults: true,
-      resetStyles: true,
+  <!-- Pagefind UI assets (generated at build time) -->
+  <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+  <script src="/pagefind/pagefind-ui.js" is:inline></script>
+  <script is:inline>
+    window.addEventListener("DOMContentLoaded", () => {
+      new PagefindUI({
+        element: "#search",
+        showSubResults: true,
+        resetStyles: true,
+      });
     });
-  });
-</script>
+  </script>
+</SiteLayout>
 
 <script is:inline>
   (function () {

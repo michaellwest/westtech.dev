@@ -26,13 +26,13 @@ This file gives AI assistants the context needed to work effectively in this rep
 ## Commands
 
 ```bash
-npm run dev       # Dev server at http://localhost:4321
-npm run build     # Production build to dist/ + Pagefind index
-npm run preview   # Build then serve locally via wrangler
-npm run deploy    # Build then deploy to Cloudflare Pages
+bun run dev       # Dev server at http://localhost:4321
+bun run build     # Production build to dist/ + Pagefind index
+bun run preview   # Build then serve locally via wrangler
+bun run deploy    # Build then deploy to Cloudflare Pages
 ```
 
-There is **no test suite** and **no linter** configured. Verify changes by running `npm run build` and checking for build errors.
+There is **no test suite** and **no linter** configured. Verify changes by running `bun run build` and checking for build errors.
 
 ## Project Structure
 
@@ -133,7 +133,7 @@ When drafting blog posts, follow the author's voice profile in `.claude/VOICE_PR
 
 ## Key Gotchas
 
-- **Search only works in production builds.** Pagefind generates its index during `npm run build`. The dev server won't have search functionality.
+- **Search only works in production builds.** Pagefind generates its index during `bun run build`. The dev server won't have search functionality.
 - **No tags or search pages.** Tags and search are on the home page (`index.astro`), not separate routes.
 - **Cloudflare adapter.** The site uses `@astrojs/cloudflare`, not pure static output. Pages deploy via `wrangler`.
 - **Content loader.** Posts use `glob()` loader, not the filesystem loader — defined in `src/content.config.ts` (not `src/content/config.ts`).

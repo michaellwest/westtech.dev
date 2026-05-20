@@ -8,16 +8,16 @@ Built with [Astro 5](https://astro.build), [Tailwind CSS v4](https://tailwindcss
 
 ## Local development
 
-**Prerequisites:** Node.js 20+
+**Prerequisites:** [Bun](https://bun.sh)
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 The dev server runs at `http://localhost:4321`.
 
-> **Note:** The search page requires a production build to work. Run `npm run build` and then `npm run preview` to test it locally.
+> **Note:** The search page requires a production build to work. Run `bun run build` and then `bun run preview` to test it locally.
 
 ---
 
@@ -104,6 +104,6 @@ scripts/
 ## Build and preview
 
 ```bash
-npm run build     # builds to /dist, then runs Pagefind indexer
-npm run preview   # serves /dist locally at http://localhost:4321
+bun run build     # builds to /dist, then runs Pagefind indexer
+bun run preview   # serves /dist locally at http://localhost:4321
 ```

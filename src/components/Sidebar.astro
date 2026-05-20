@@ -5,9 +5,17 @@ import RecentPosts from "./RecentPosts.astro";
 import MvpAwards from "./MvpAwards.astro";
 ---
 
-<div class="flex flex-col gap-8">
-  <GitHubSponsor />
-  <StackExchangeFlair />
-  <RecentPosts />
-  <MvpAwards />
+<div class="flex flex-col gap-4">
+  <div class="bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl p-5">
+    <GitHubSponsor />
+  </div>
+  <div class="bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl p-5">
+    <StackExchangeFlair />
+  </div>
+  <div class="bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl p-5">
+    <RecentPosts />
+  </div>
+  <div class="bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl p-5">
+    <MvpAwards />
+  </div>
 </div>

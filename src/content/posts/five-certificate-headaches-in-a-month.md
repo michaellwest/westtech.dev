@@ -6,17 +6,17 @@ tags: [certificates, security, powershell]
 draft: false
 ---
 
-Five different certificate problems in the last month, across five different services. Each one used to be a multi-tool, multi-tab, copy-into-textarea ritual. This post is the short version of how each one looked, and the [Certz](/certz-0-4-certificate-management-utility) commands that replaced the OpenSSL contortions.
+In the last month I ran into five different certificate problems across five different services. Some were mine, some came in over the fence from a teammate or a vendor, but each one used to be a multi-tool, multi-tab ritual that ate more time than the actual fix. Here is the short version of how each one looked, and the [Certz](/certz-0-4-certificate-management-utility) command I reached for instead of the usual OpenSSL contortions.
 
 ## A space in the SAN
 
-Someone produced a certificate with a stray whitespace character in a `dnsName` Subject Alternative Name. The cert generated, the cert installed, and most TLS clients did not complain immediately — which is the worst possible failure mode, because it means the bad cert ships and surfaces somewhere downstream where the diagnosis is messy. RFC 5280 is clear that `dnsName` is an `IA5String` and the CA/Browser Forum requirements (BR-019) explicitly forbid whitespace, but if your generation tool does not validate the SAN before signing, you can ship one without noticing.
+A teammate handed me a freshly generated certificate with a stray whitespace character in a `dnsName` Subject Alternative Name. The cert generated, the cert installed, and most TLS clients did not complain immediately. That is the worst kind of certificate bug, because the bad cert ships and surfaces somewhere downstream where the diagnosis is messy. RFC 5280 is clear that `dnsName` is an `IA5String` and the CA/Browser Forum baseline requirements forbid whitespace, but if your generation tool does not validate the SAN before signing, you can ship one without noticing.
 
 ```powershell
 certz lint cert.pfx --password $env:CERT_PASS --severity error
 ```
 
-The lint output flags the offending SAN by name and points at BR-019. If your CI pipeline runs `lint` against every PFX it produces, this never escapes the build.
+The lint output flags the offending SAN by name and points at BR-019.
 
 ## A PFX I could not verify
 
@@ -38,7 +38,7 @@ Right password, you get a panel with subject, issuer, validity, SANs, and the ke
 
 ## An incomplete chain on a live URL
 
-A routine TLS rotation went out on a Friday afternoon. Cert valid, CN and SANs correct, browsers in my profile happy. The synthetic monitor disagreed:
+A routine TLS rotation went out on a Friday afternoon. Cert valid, CN and SANs correct, browsers happy. I logged off. The synthetic monitor disagreed:
 
 ```
 TLS handshake failed: certificate unknown
@@ -56,11 +56,11 @@ Subject, issuer, SANs, validity dates, and a chain tree — with one yellow line
 Chain validation: incomplete chain (intermediate not presented)
 ```
 
-The CA had rotated the intermediate. The deploy script's bundle step silently dropped the new one because it was looking for the old filename. Five minutes of fixing the bundle, push, restart, recover. The fix was not the interesting part — the diagnosis taking one command instead of fifteen was.
+The CA had rotated the intermediate. The deploy script's bundle step silently dropped the new one because it was looking for the old filename. Five minutes of fixing the bundle, push, restart, recover.
 
 ## Load balancer vs IIS
 
-We had a service fronted by a load balancer that terminated TLS with a public cert, and an IIS server behind it that also presented a cert — the LB-to-IIS hop ran TLS, not plaintext. After a partial rotation we were not sure if both ends had been updated. Browsers only see the LB; the IIS cert is invisible from the outside.
+We had a service fronted by a load balancer that terminated TLS with a public cert, and an IIS server behind it that also presented a cert — the LB-to-IIS hop ran TLS, not plaintext. After a partial rotation we were not sure if both ends had been updated, and the next deploy was waiting on us to confirm. Browsers only see the LB; the IIS cert is invisible from the outside.
 
 I used to run `certz inspect` against each URL and eyeball the thumbprints. `diff` does the same thing in one command and accepts URLs directly:
 
@@ -68,11 +68,11 @@ I used to run `certz inspect` against each URL and eyeball the thumbprints. `dif
 certz diff https://service.example.com https://iis-internal:443
 ```
 
-The output is a four-column table — Property, Left, Right, Status — with the changed fields highlighted. In my case the LB had been rotated and the IIS server had not. Subject and SANs matched (same cert template), but Serial Number, Thumbprint, and Valid From all flagged as `changed`. Exit code 1 because they differed, which means the same command works as a CI gate after a rotation.
+The output is a four-column table — Property, Left, Right, Status — with the changed fields highlighted. In my case the LB had been rotated and the IIS server had not. Subject and SANs matched (same cert template), but Serial Number, Thumbprint, and Valid From all flagged as `changed`.
 
 ## Identity Server cannot read its own key
 
-A Sitecore XM Identity Server on Windows IIS stopped issuing tokens. The Identity Server logs were a stream of:
+We rebuilt the IIS host that runs an XM Identity Server, brought everything back up, and walked away. The next time someone tried to sign in, the Identity Server logs were a stream of:
 
 ```
 CryptographicException: Keyset does not exist
@@ -126,8 +126,6 @@ Configuring the IIS bindings and granting the app pool ACL on the private key ar
 
 The first time I ran this end-to-end and had a working Sitecore XM cert ready to import into IIS in under five minutes, I deleted a `setup-dev-cert.ps1` script that had been growing organically since around 2018. It was 220 lines.
 
-## Takeaway
+---
 
-None of the small ones were exotic. The space in a SAN, the unverified PFX password, the incomplete chain on a live URL, the LB-vs-origin comparison, the Identity Server private-key ACL — all of them are the kind of thing you will see if you operate enough services for long enough. What changed is the time-to-diagnosis. The tool you reach for first determines whether "what is going on with this certificate?" is fifteen minutes or fifteen seconds. And when several constraints stack up at once — the Sitecore stack being the obvious example — the difference is more like a morning versus five minutes.
-
-If you are doing certificate work on a developer machine or a build server and you have not picked up [Certz](https://github.com/michaellwest/certz) yet, give it a try. Feedback and issue reports are welcome.
+[Certz](https://github.com/michaellwest/certz) is on GitHub. Feedback welcome.

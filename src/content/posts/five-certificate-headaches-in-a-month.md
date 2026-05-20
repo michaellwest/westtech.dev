@@ -1,7 +1,7 @@
 ---
 title: "Five Certificate Headaches in a Month"
 created: 2026-05-06
-description: "A stray space in a SAN, a PFX password I could not verify, an incomplete chain on a live URL, a load balancer disagreeing with its IIS origin, and Sitecore Identity Server unable to read its own private key — and the Certz commands that replaced the OpenSSL contortions."
+description: "Five certificate problems across five services in one month — and the Certz commands I reached for instead of the usual OpenSSL contortions."
 tags: [certificates, security, powershell]
 draft: false
 ---
@@ -88,7 +88,7 @@ Subject right, validity right, `HasPrivateKey: true`. So the cert was fine. The 
 
 The fix today is still a `certlm.msc` -> Manage Private Keys click-fest, or `icacls` against the right file under `Crypto\Keys` (CNG) or `Crypto\RSA\MachineKeys` (legacy CSP) once you resolve the key file path. There is no clean one-liner yet.
 
-> **Coming soon:** I have [#69](https://github.com/michaellwest/certz/issues/69) open in Certz to add a `certz grant` command so this lives in the deploy script next to `certz trust add`, instead of in a runbook. If this failure mode is recurring for you too, watch that issue or chime in.
+> I have [#69](https://github.com/michaellwest/certz/issues/69) open in Certz to add a `certz grant` command so this lives in the deploy script next to `certz trust add`, instead of in a runbook. If this failure mode is recurring for you too, watch that issue or chime in.
 
 The diagnosis is still fast even without the grant command: one `certz inspect` confirms the cert is good, which collapses the problem space to "ACL on the key file." From there it is mechanical.
 
@@ -122,7 +122,7 @@ certz create dev cm.local `
     --trust
 ```
 
-Configuring the IIS bindings and granting the app pool ACL on the private key are still separate steps — the IIS bindings are mechanical with the IIS PowerShell module, and the ACL grant is the same `certlm.msc` shuffle covered earlier (and is what [#69](https://github.com/michaellwest/certz/issues/69) is going to fix). But the cert *generation* part — which used to sprawl across a custom script and was where most of the morning went — collapses into the two commands above. The leaf cert is regenerated whenever validity expires or the topology changes, which with the [398-day CA/Browser Forum limit](https://cabforum.org/working-groups/server/baseline-requirements/) happens more often than you would think.
+Configuring the IIS bindings and granting the app pool ACL on the private key are still separate steps — the IIS bindings are mechanical with the IIS PowerShell module, and the ACL grant is the same `certlm.msc` shuffle covered earlier. But the cert *generation* part — which used to sprawl across a custom script and was where most of the morning went — collapses into the two commands above. The leaf cert is regenerated whenever validity expires or the topology changes, which with the [398-day CA/Browser Forum limit](https://cabforum.org/working-groups/server/baseline-requirements/) happens more often than you would think.
 
 The first time I ran this end-to-end and had a working Sitecore XM cert ready to import into IIS in under five minutes, I deleted a `setup-dev-cert.ps1` script that had been growing organically since around 2018. It was 220 lines.
 

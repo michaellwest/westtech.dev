@@ -25,6 +25,13 @@ Thumbs.db
 
 # Claude Code — local permissions (machine-specific paths, not for team/CI)
 .claude/settings.local.json
+.claude_worklog.md
+
+# Workflow scratch (design exploration, draft posts not yet ready to commit)
+mockups/
+scripts/mockup-thumbnails.mjs
+/blog.md
+/blog2.md
 
 # wrangler files
 .wrangler

@@ -9,6 +9,8 @@ export default defineConfig({
   site: "https://westtech.dev",
   integrations: [sitemap()],
 
+  server: { port: 4400 },
+
   vite: {
     plugins: [tailwindcss()],
   },

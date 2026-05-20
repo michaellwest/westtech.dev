@@ -2,8 +2,8 @@
 
 Canonical index of all posts on westtech.dev. Claude reads this file to avoid duplication, maintain tag consistency, and recall prior topics when drafting new posts.
 
-**Total posts:** 90 (88 migrated from Blogspot + 2 native)
-**Last updated:** 2026-03-04
+**Total posts:** 92 (88 migrated from Blogspot + 4 native)
+**Last updated:** 2026-05-20
 
 ---
 
@@ -15,6 +15,8 @@ Sorted by date. All posts live in `src/content/posts/`.
 
 | Slug | Title | Date | Tags |
 |---|---|---|---|
+| five-certificate-headaches-in-a-month | Five Certificate Headaches in a Month | 2026-05-06 | certificates, security, powershell |
+| identity-server-ecdsa-certificate-pitfall | Identity Server ECDSA Certificate Pitfall | 2026-03-12 | sitecore, certificates, identity, docker, security |
 | certz-0-4-certificate-management-utility | Certz 0.4: A Certificate Management Utility | 2026-03-04 | certificates, dotnet, powershell |
 | precision-scheduler-v1-1-0 | PrecisionScheduler v1.1.0: Fixing the Bugs That Hurt in Production | 2026-02-25 | sitecore, dotnet, hangfire |
 

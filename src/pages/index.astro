@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import SiteLayout from "../layouts/SiteLayout.astro";
+import Card from "../components/Card.astro";
 import PostCard from "../components/PostCard.astro";
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
@@ -22,13 +23,13 @@ const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   <h1 class="sr-only">westtech.dev — all posts</h1>
 
   <!-- Search section -->
-  <section class="border-b border-zinc-100 dark:border-zinc-800 pb-6 mb-6">
+  <Card as="section" class="mb-6">
     <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">Search</p>
     <div id="search"></div>
-  </section>
+  </Card>
 
   <!-- Tag cloud section -->
-  <section class="border-b border-zinc-100 dark:border-zinc-800 pb-6 mb-6">
+  <Card as="section" class="mb-6">
     <p class="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">Filter by tag</p>
     <div class="flex flex-wrap gap-2" id="tag-cloud">
       <button
@@ -50,7 +51,7 @@ const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
         );
       })}
     </div>
-  </section>
+  </Card>
 
   <!-- Post list -->
   <section>
@@ -58,7 +59,7 @@ const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
       posts.length === 0 ? (
         <p class="text-zinc-500 dark:text-zinc-400">No posts yet. Check back soon.</p>
       ) : (
-        <ul id="post-list">
+        <ul id="post-list" class="space-y-4">
           {posts.map((post, index) => {
             const tagSlugs = post.data.tags
               .map((t) => t.toLowerCase().replace(/\s+/g, "-"))
@@ -178,7 +179,7 @@ const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
   html.dark {
     --pagefind-ui-text: #f4f4f5;
-    --pagefind-ui-background: #09090b;
+    --pagefind-ui-background: #18181b;
     --pagefind-ui-border: #27272a;
     --pagefind-ui-tag: #27272a;
   }

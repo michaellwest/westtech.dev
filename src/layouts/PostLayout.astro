@@ -1,5 +1,6 @@
 ---
 import SiteLayout from "./SiteLayout.astro";
+import Card from "../components/Card.astro";
 import TagPill from "../components/TagPill.astro";
 
 interface Props {
@@ -22,7 +23,7 @@ const formatDate = (d: Date) =>
 ---
 
 <SiteLayout title={title} description={description} ogImage={ogImage}>
-  <article>
+  <Card as="article" padding="p-6 sm:p-8">
     {typeof heroImage === "string" && (
       <img
         src={heroImage}
@@ -57,7 +58,7 @@ const formatDate = (d: Date) =>
           updated && (
             <time
               datetime={updated.toISOString()}
-              class="text-sm text-zinc-400 dark:text-zinc-500 italic"
+              class="text-sm text-zinc-500 dark:text-zinc-400 italic"
             >
               Updated {formatDate(updated)}
             </time>
@@ -81,7 +82,7 @@ const formatDate = (d: Date) =>
     <div class="prose-styles">
       <slot />
     </div>
-  </article>
+  </Card>
 </SiteLayout>
 
 <style>
@@ -132,10 +133,10 @@ const formatDate = (d: Date) =>
     @apply rounded-lg my-6 max-w-full;
   }
   .migrated-notice {
-    @apply text-xs text-zinc-400 dark:text-zinc-500 mb-6;
+    @apply text-xs text-zinc-500 dark:text-zinc-400 mb-6;
   }
   .migrated-notice :global(a) {
-    @apply text-zinc-400 dark:text-zinc-500 underline hover:text-zinc-600 dark:hover:text-zinc-400;
+    @apply text-zinc-500 dark:text-zinc-400 underline hover:text-zinc-700 dark:hover:text-zinc-300;
   }
   .prose-styles :global(table) {
     @apply w-full text-sm border-collapse my-4;

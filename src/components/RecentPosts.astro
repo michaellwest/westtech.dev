@@ -18,7 +18,7 @@ function formatDate(d: Date) {
 ---
 
 <div>
-  <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">
+  <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">
     Recently Updated
   </h2>
   <ul class="space-y-3">
@@ -34,7 +34,7 @@ function formatDate(d: Date) {
             >
               {post.data.title}
             </a>
-            <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               {isUpdated ? "Updated " : ""}{formatDate(displayDate)}
             </p>
           </li>

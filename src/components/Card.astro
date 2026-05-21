@@ -2,11 +2,12 @@
 interface Props {
   as?: string;
   class?: string;
+  padding?: string;
 }
 
-const { as: Tag = "div", class: className = "" } = Astro.props;
+const { as: Tag = "div", class: className = "", padding = "p-5" } = Astro.props;
 ---
 
-<Tag class:list={["bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl p-5", className]}>
+<Tag class:list={["bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl", padding, className]}>
   <slot />
 </Tag>

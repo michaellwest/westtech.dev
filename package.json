@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
+    "dev:host": "astro dev --host --port 4401",
     "build": "bun scripts/generate-og.mjs && astro build && bunx pagefind --site dist/client",
     "preview": "bun run build && wrangler dev",
     "astro": "astro",

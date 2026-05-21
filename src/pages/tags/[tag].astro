@@ -5,6 +5,9 @@ import SiteLayout from "../../layouts/SiteLayout.astro";
 import Card from "../../components/Card.astro";
 import PostCard from "../../components/PostCard.astro";
 
+// Cloudflare adapter prerenders getStaticPaths in an isolated context that
+// doesn't close over module-scope consts — keep the slugify body inlined
+// inside getStaticPaths below, not a call to this helper.
 const slugify = (tag: string) => tag.toLowerCase().replace(/\s+/g, "-");
 
 export const getStaticPaths: GetStaticPaths = async () => {

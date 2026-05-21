@@ -1,4 +1,5 @@
 ---
+import Card from "./Card.astro";
 import GitHubSponsor from "./GitHubSponsor.astro";
 import StackExchangeFlair from "./StackExchangeFlair.astro";
 import RecentPosts from "./RecentPosts.astro";
@@ -6,16 +7,16 @@ import MvpAwards from "./MvpAwards.astro";
 ---
 
 <div class="flex flex-col gap-4">
-  <div class="bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl p-5">
+  <Card>
     <GitHubSponsor />
-  </div>
-  <div class="bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl p-5">
+  </Card>
+  <Card>
     <StackExchangeFlair />
-  </div>
-  <div class="bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl p-5">
+  </Card>
+  <Card>
     <RecentPosts />
-  </div>
-  <div class="bg-white dark:bg-zinc-900 ring-1 ring-zinc-200 dark:ring-zinc-800 rounded-xl p-5">
+  </Card>
+  <Card>
     <MvpAwards />
-  </div>
+  </Card>
 </div>

@@ -1,0 +1,157 @@
+---
+import type { GetStaticPaths, Page } from "astro";
+import { getCollection } from "astro:content";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import Card from "../components/Card.astro";
+import PostCard from "../components/PostCard.astro";
+import Pagination from "../components/Pagination.astro";
+
+type PostEntry = Awaited<ReturnType<typeof getCollection<"posts">>>[number];
+
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+  const all = await getCollection("posts", ({ data }) => !data.draft);
+  const sorted = all.sort(
+    (a, b) => b.data.created.getTime() - a.data.created.getTime()
+  );
+  return paginate(sorted, { pageSize: 10 });
+};
+
+interface Props {
+  page: Page<PostEntry>;
+}
+
+const { page } = Astro.props;
+
+// Tag cloud is built from the full collection, not just the current page,
+// so it stays stable across paginated views.
+const allPosts = await getCollection("posts", ({ data }) => !data.draft);
+const tagMap = new Map<string, number>();
+for (const post of allPosts) {
+  for (const tag of post.data.tags) {
+    tagMap.set(tag, (tagMap.get(tag) ?? 0) + 1);
+  }
+}
+const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+
+const hrefForPage = (n: number) => (n === 1 ? "/" : `/${n}`);
+
+const pageTitle =
+  page.currentPage === 1
+    ? "westtech.dev"
+    : `westtech.dev — page ${page.currentPage}`;
+
+const canonicalUrl = new URL(
+  hrefForPage(page.currentPage),
+  Astro.site
+).toString();
+---
+
+<SiteLayout title={pageTitle} canonicalUrl={canonicalUrl}>
+  <h1 class="sr-only">westtech.dev — posts (page {page.currentPage} of {page.lastPage})</h1>
+
+  {page.currentPage === 1 && (
+    <Card as="section" class="mb-6">
+      <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">Search</p>
+      <div id="search"></div>
+    </Card>
+  )}
+
+  {page.currentPage === 1 && (
+    <Card as="section" class="mb-6">
+      <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">Browse by tag</p>
+      <div class="flex flex-wrap gap-2">
+        {tags.map(([tag, count]) => {
+          const slug = tag.toLowerCase().replace(/\s+/g, "-");
+          return (
+            <a
+              href={`/tags/${slug}/`}
+              class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+            >
+              {tag}
+              <span class="ml-1 text-zinc-500 dark:text-zinc-400">{count}</span>
+            </a>
+          );
+        })}
+      </div>
+    </Card>
+  )}
+
+  <section>
+    {page.data.length === 0 ? (
+      <p class="text-zinc-500 dark:text-zinc-400">No posts yet. Check back soon.</p>
+    ) : (
+      <ul class="space-y-4">
+        {page.data.map((post, index) => (
+          <li>
+            <PostCard
+              title={post.data.title}
+              date={post.data.created}
+              description={post.data.description}
+              tags={post.data.tags}
+              slug={post.id}
+              heroImage={post.data.heroImage}
+              eager={page.currentPage === 1 && index === 0}
+            />
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <Pagination
+    currentPage={page.currentPage}
+    lastPage={page.lastPage}
+    prevUrl={page.url.prev}
+    nextUrl={page.url.next}
+    hrefForPage={hrefForPage}
+  />
+
+  {page.currentPage === 1 && (
+    <>
+      <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+      <script src="/pagefind/pagefind-ui.js" is:inline></script>
+      <script is:inline>
+        window.addEventListener("DOMContentLoaded", () => {
+          new PagefindUI({
+            element: "#search",
+            showSubResults: true,
+            resetStyles: true,
+          });
+        });
+      </script>
+    </>
+  )}
+</SiteLayout>
+
+<script is:inline>
+  // Legacy support: old /?tag=X bookmarks redirect to /tags/X/
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var tag = params.get("tag");
+    if (tag) {
+      window.location.replace("/tags/" + encodeURIComponent(tag) + "/");
+    }
+  })();
+</script>
+
+<style>
+  /* Pagefind palette overrides */
+  :root {
+    --pagefind-ui-scale: 0.9;
+    --pagefind-ui-primary: #2563eb;
+    --pagefind-ui-text: #18181b;
+    --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: #e4e4e7;
+    --pagefind-ui-tag: #f4f4f5;
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 6px;
+    --pagefind-ui-font: system-ui, sans-serif;
+  }
+
+  html.dark {
+    --pagefind-ui-text: #f4f4f5;
+    --pagefind-ui-background: #18181b;
+    --pagefind-ui-border: #27272a;
+    --pagefind-ui-tag: #27272a;
+  }
+</style>

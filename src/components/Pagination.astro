@@ -1,0 +1,69 @@
+---
+interface Props {
+  currentPage: number;
+  lastPage: number;
+  prevUrl?: string;
+  nextUrl?: string;
+  /** Returns the URL for a given page number (1-indexed). */
+  hrefForPage: (n: number) => string;
+}
+
+const { currentPage, lastPage, prevUrl, nextUrl, hrefForPage } = Astro.props;
+
+type PageEntry = number | "ellipsis";
+
+function buildPageList(current: number, last: number): PageEntry[] {
+  if (last <= 7) {
+    return Array.from({ length: last }, (_, i) => i + 1);
+  }
+  const pages: PageEntry[] = [1];
+  const start = Math.max(2, current - 1);
+  const end = Math.min(last - 1, current + 1);
+  if (start > 2) pages.push("ellipsis");
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (end < last - 1) pages.push("ellipsis");
+  pages.push(last);
+  return pages;
+}
+
+const pages = buildPageList(currentPage, lastPage);
+
+const baseChip =
+  "inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-full text-sm font-medium transition-colors";
+const idleChip =
+  "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-blue-100 dark:hover:bg-blue-900/30";
+const activeChip =
+  "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-semibold";
+const disabledChip =
+  "bg-zinc-50 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-600 cursor-not-allowed";
+---
+
+{lastPage > 1 && (
+  <nav aria-label="Pagination" class="mt-8 flex items-center justify-center gap-2 flex-wrap">
+    {prevUrl ? (
+      <a href={prevUrl} rel="prev" aria-label="Previous page" class:list={[baseChip, idleChip]}>
+        &larr; Prev
+      </a>
+    ) : (
+      <span aria-hidden="true" class:list={[baseChip, disabledChip]}>&larr; Prev</span>
+    )}
+
+    {pages.map((p) =>
+      p === "ellipsis" ? (
+        <span aria-hidden="true" class="px-1 text-zinc-500 dark:text-zinc-400">…</span>
+      ) : p === currentPage ? (
+        <span aria-current="page" class:list={[baseChip, activeChip]}>{p}</span>
+      ) : (
+        <a href={hrefForPage(p)} aria-label={`Page ${p}`} class:list={[baseChip, idleChip]}>{p}</a>
+      )
+    )}
+
+    {nextUrl ? (
+      <a href={nextUrl} rel="next" aria-label="Next page" class:list={[baseChip, idleChip]}>
+        Next &rarr;
+      </a>
+    ) : (
+      <span aria-hidden="true" class:list={[baseChip, disabledChip]}>Next &rarr;</span>
+    )}
+  </nav>
+)}

@@ -15,4 +15,30 @@
   html.dark {
     color-scheme: dark;
   }
+
+  /* Shiki dual-theme: github-light by default, github-dark when html.dark.
+     Shiki emits both color sets as CSS vars when defaultColor: false.
+     Background is set only on the <pre> (not on spans, which should stay
+     transparent so the pre surface shows through). Light-mode bg is overridden
+     to #f6f8fa — github-light's #fff is the same as the Card surface. */
+  pre.astro-code {
+    background-color: #f6f8fa;
+  }
+  pre.astro-code,
+  pre.astro-code span {
+    color: var(--shiki-light);
+    font-style: var(--shiki-light-font-style);
+    font-weight: var(--shiki-light-font-weight);
+    text-decoration: var(--shiki-light-text-decoration);
+  }
+  html.dark pre.astro-code {
+    background-color: var(--shiki-dark-bg);
+  }
+  html.dark pre.astro-code,
+  html.dark pre.astro-code span {
+    color: var(--shiki-dark);
+    font-style: var(--shiki-dark-font-style);
+    font-weight: var(--shiki-dark-font-weight);
+    text-decoration: var(--shiki-dark-text-decoration);
+  }
 }

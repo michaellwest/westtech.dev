@@ -100,7 +100,7 @@ const formatDate = (d: Date) =>
     @apply mb-4 leading-7 text-zinc-700 dark:text-zinc-300;
   }
   .prose-styles :global(a) {
-    @apply text-blue-600 dark:text-blue-400 underline underline-offset-2 hover:text-blue-800 dark:hover:text-blue-300;
+    @apply text-blue-600 dark:text-blue-400 underline underline-offset-2 hover:text-blue-800 dark:hover:text-blue-300 break-words;
   }
   .prose-styles :global(ul) {
     @apply list-disc pl-5 mb-4 space-y-1 text-zinc-700 dark:text-zinc-300;
@@ -115,13 +115,30 @@ const formatDate = (d: Date) =>
     @apply font-semibold text-zinc-900 dark:text-zinc-100;
   }
   .prose-styles :global(code:not(pre code)) {
-    @apply bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded px-1.5 py-0.5 text-sm font-mono;
+    @apply bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded px-1.5 py-0.5 font-mono;
+    font-size: 0.9em;
   }
   .prose-styles :global(pre) {
-    @apply rounded-lg my-5 overflow-x-auto text-sm;
+    @apply relative rounded-lg my-5 overflow-x-auto text-sm;
   }
   .prose-styles :global(pre code) {
-    @apply block p-4;
+    @apply block px-4 pb-4 pt-6;
+  }
+  /* Language tag in the top-right corner of each code block. */
+  .prose-styles :global(pre[data-language])::before {
+    content: attr(data-language);
+    @apply absolute top-2 right-3 font-mono text-zinc-400/80 select-none pointer-events-none;
+    font-size: 0.6875rem;
+    letter-spacing: 0.05em;
+  }
+  /* Map the `ps` Shiki alias to "powershell" for display. */
+  .prose-styles :global(pre[data-language="ps"])::before {
+    content: "powershell";
+  }
+  /* Hide tag for plain-text fences. */
+  .prose-styles :global(pre[data-language="text"])::before,
+  .prose-styles :global(pre[data-language="plaintext"])::before {
+    content: none;
   }
   .prose-styles :global(blockquote) {
     @apply border-l-4 border-blue-500 pl-4 italic text-zinc-600 dark:text-zinc-400 my-4;

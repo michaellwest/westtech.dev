@@ -208,18 +208,28 @@ const formatDate = (d: Date) =>
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
   const ICON_CHECK =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+  // Per-button reset timer. Stored externally so rapid clicks clear the
+  // stale timer before scheduling a fresh one — otherwise the previous
+  // click's timeout would prematurely revert the new state.
+  const resetTimers = new WeakMap<HTMLButtonElement, number>();
 
   function setState(btn: HTMLButtonElement, state: "" | "success" | "error", label: string, icon: string) {
     btn.classList.toggle("is-success", state === "success");
     btn.classList.toggle("is-error", state === "error");
     const iconEl = btn.querySelector(".copy-btn-icon");
     const labelEl = btn.querySelector(".copy-btn-label");
+    const statusEl = btn.querySelector(".copy-btn-status");
     if (iconEl) iconEl.innerHTML = icon;
     if (labelEl) labelEl.textContent = label;
-    btn.setAttribute(
-      "aria-label",
-      state === "success" ? "Code copied" : state === "error" ? "Copy failed" : "Copy code"
-    );
+    const aria = state === "success" ? "Code copied" : state === "error" ? "Copy failed" : "Copy code";
+    btn.setAttribute("aria-label", aria);
+    btn.title = aria;
+    // Drive the aria-live region only on the active states so the polite
+    // announcer doesn't re-fire when the button resets back to "Copy code".
+    if (statusEl) {
+      statusEl.textContent =
+        state === "success" ? "Code copied to clipboard" : state === "error" ? "Copy failed" : "";
+    }
   }
 
   // Legacy fallback for insecure contexts (LAN/Tailscale dev over plain HTTP,
@@ -248,7 +258,10 @@ const formatDate = (d: Date) =>
   async function copyPre(pre: HTMLPreElement, btn: HTMLButtonElement) {
     const code = pre.querySelector("code");
     if (!code) return;
-    const text = code.textContent ?? "";
+    // Strip Shiki's trailing newline so pasting a single-line snippet into
+    // a shell doesn't auto-execute on the closing fence's implicit \n.
+    const text = (code.textContent ?? "").replace(/\n+$/, "");
+    if (!text) return;
     let ok = false;
     if (navigator.clipboard && window.isSecureContext) {
       try {
@@ -259,20 +272,26 @@ const formatDate = (d: Date) =>
       }
     }
     if (!ok) ok = legacyCopy(text);
-    if (ok) {
-      setState(btn, "success", "Copied", ICON_CHECK);
-    } else {
-      setState(btn, "error", "Failed", ICON_CLIPBOARD);
-    }
-    setTimeout(() => setState(btn, "", "Copy", ICON_CLIPBOARD), COPY_RESET_MS);
+    setState(btn, ok ? "success" : "error", ok ? "Copied" : "Failed", ok ? ICON_CHECK : ICON_CLIPBOARD);
+    const prev = resetTimers.get(btn);
+    if (prev !== undefined) clearTimeout(prev);
+    resetTimers.set(
+      btn,
+      window.setTimeout(() => setState(btn, "", "Copy", ICON_CLIPBOARD), COPY_RESET_MS)
+    );
   }
 
   document.querySelectorAll<HTMLPreElement>(".prose-styles pre.astro-code").forEach((pre) => {
+    // Skip empty fenced blocks — no useful copy target, and the secure /
+    // insecure paths report inconsistent feedback for an empty string.
+    const code = pre.querySelector("code");
+    if (!code || !(code.textContent ?? "").trim()) return;
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "copy-btn";
     btn.setAttribute("aria-label", "Copy code");
-    btn.innerHTML = `<span class="copy-btn-icon" aria-hidden="true">${ICON_CLIPBOARD}</span><span class="copy-btn-label" aria-hidden="true">Copy</span>`;
+    btn.title = "Copy code";
+    btn.innerHTML = `<span class="copy-btn-icon" aria-hidden="true">${ICON_CLIPBOARD}</span><span class="copy-btn-label" aria-hidden="true">Copy</span><span class="copy-btn-status sr-only" aria-live="polite"></span>`;
     btn.addEventListener("click", () => copyPre(pre, btn));
     pre.appendChild(btn);
   });

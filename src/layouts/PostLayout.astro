@@ -122,12 +122,13 @@ const formatDate = (d: Date) =>
     @apply relative rounded-lg my-5 overflow-x-auto text-sm;
   }
   .prose-styles :global(pre code) {
-    @apply block px-4 pb-4 pt-6;
+    @apply block px-4 pb-4 pt-10;
   }
-  /* Language tag in the top-right corner of each code block. */
+  /* Language tag in the top-left corner of each code block.
+     Top-right is reserved for the copy button (injected by the script below). */
   .prose-styles :global(pre[data-language])::before {
     content: attr(data-language);
-    @apply absolute top-2 right-3 font-mono text-zinc-400/80 select-none pointer-events-none;
+    @apply absolute top-2 left-3 font-mono text-zinc-400/80 select-none pointer-events-none;
     font-size: 0.6875rem;
     letter-spacing: 0.05em;
   }
@@ -139,6 +140,27 @@ const formatDate = (d: Date) =>
   .prose-styles :global(pre[data-language="text"])::before,
   .prose-styles :global(pre[data-language="plaintext"])::before {
     content: none;
+  }
+  /* Copy-code button. Injected at runtime by the script below; styled here
+     so resting/hover/success/error states ship in the CSS bundle. */
+  .prose-styles :global(.copy-btn) {
+    @apply absolute top-1.5 right-1.5 inline-flex items-center gap-1 px-1.5 py-1 rounded-md font-mono text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer;
+    font-size: 0.6875rem;
+    letter-spacing: 0.05em;
+  }
+  .prose-styles :global(.copy-btn-label) {
+    @apply hidden;
+  }
+  .prose-styles :global(.copy-btn.is-success),
+  .prose-styles :global(.copy-btn.is-error) {
+    @apply text-zinc-900 dark:text-zinc-100;
+  }
+  .prose-styles :global(.copy-btn.is-success .copy-btn-label),
+  .prose-styles :global(.copy-btn.is-error .copy-btn-label) {
+    @apply inline;
+  }
+  .prose-styles :global(.copy-btn svg) {
+    @apply w-3.5 h-3.5;
   }
   .prose-styles :global(blockquote) {
     @apply border-l-4 border-blue-500 pl-4 italic text-zinc-600 dark:text-zinc-400 my-4;
@@ -175,3 +197,102 @@ const formatDate = (d: Date) =>
     max-width: 720px;
   }
 </style>
+
+<script>
+  // Copy-code button. Walks every Shiki <pre> in the post body, injects a small
+  // top-right button, copies the inner <code> textContent on click. Mermaid
+  // blocks are skipped automatically — rehype-mermaid emits .mermaid-block, not
+  // pre.astro-code. Selector also excludes any other non-Shiki <pre>.
+  const COPY_RESET_MS = 1500;
+  const ICON_CLIPBOARD =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+  const ICON_CHECK =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+  // Per-button reset timer. Stored externally so rapid clicks clear the
+  // stale timer before scheduling a fresh one — otherwise the previous
+  // click's timeout would prematurely revert the new state.
+  const resetTimers = new WeakMap<HTMLButtonElement, number>();
+
+  function setState(btn: HTMLButtonElement, state: "" | "success" | "error", label: string, icon: string) {
+    btn.classList.toggle("is-success", state === "success");
+    btn.classList.toggle("is-error", state === "error");
+    const iconEl = btn.querySelector(".copy-btn-icon");
+    const labelEl = btn.querySelector(".copy-btn-label");
+    const statusEl = btn.querySelector(".copy-btn-status");
+    if (iconEl) iconEl.innerHTML = icon;
+    if (labelEl) labelEl.textContent = label;
+    const aria = state === "success" ? "Code copied" : state === "error" ? "Copy failed" : "Copy code";
+    btn.setAttribute("aria-label", aria);
+    btn.title = aria;
+    // Drive the aria-live region only on the active states so the polite
+    // announcer doesn't re-fire when the button resets back to "Copy code".
+    if (statusEl) {
+      statusEl.textContent =
+        state === "success" ? "Code copied to clipboard" : state === "error" ? "Copy failed" : "";
+    }
+  }
+
+  // Legacy fallback for insecure contexts (LAN/Tailscale dev over plain HTTP,
+  // file://, etc.) where navigator.clipboard is unavailable. The hidden
+  // textarea + execCommand("copy") path doesn't require a secure origin —
+  // only a user-activation event, which the click handler is.
+  function legacyCopy(text: string): boolean {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "0";
+    ta.style.left = "0";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      return document.execCommand("copy");
+    } catch {
+      return false;
+    } finally {
+      document.body.removeChild(ta);
+    }
+  }
+
+  async function copyPre(pre: HTMLPreElement, btn: HTMLButtonElement) {
+    const code = pre.querySelector("code");
+    if (!code) return;
+    // Strip Shiki's trailing newline so pasting a single-line snippet into
+    // a shell doesn't auto-execute on the closing fence's implicit \n.
+    const text = (code.textContent ?? "").replace(/\n+$/, "");
+    if (!text) return;
+    let ok = false;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } catch (err) {
+        console.warn("[copy-btn] clipboard API failed, trying legacy", err);
+      }
+    }
+    if (!ok) ok = legacyCopy(text);
+    setState(btn, ok ? "success" : "error", ok ? "Copied" : "Failed", ok ? ICON_CHECK : ICON_CLIPBOARD);
+    const prev = resetTimers.get(btn);
+    if (prev !== undefined) clearTimeout(prev);
+    resetTimers.set(
+      btn,
+      window.setTimeout(() => setState(btn, "", "Copy", ICON_CLIPBOARD), COPY_RESET_MS)
+    );
+  }
+
+  document.querySelectorAll<HTMLPreElement>(".prose-styles pre.astro-code").forEach((pre) => {
+    // Skip empty fenced blocks — no useful copy target, and the secure /
+    // insecure paths report inconsistent feedback for an empty string.
+    const code = pre.querySelector("code");
+    if (!code || !(code.textContent ?? "").trim()) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "copy-btn";
+    btn.setAttribute("aria-label", "Copy code");
+    btn.title = "Copy code";
+    btn.innerHTML = `<span class="copy-btn-icon" aria-hidden="true">${ICON_CLIPBOARD}</span><span class="copy-btn-label" aria-hidden="true">Copy</span><span class="copy-btn-status sr-only" aria-live="polite"></span>`;
+    btn.addEventListener("click", () => copyPre(pre, btn));
+    pre.appendChild(btn);
+  });
+</script>

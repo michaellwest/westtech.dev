@@ -222,14 +222,46 @@ const formatDate = (d: Date) =>
     );
   }
 
+  // Legacy fallback for insecure contexts (LAN/Tailscale dev over plain HTTP,
+  // file://, etc.) where navigator.clipboard is unavailable. The hidden
+  // textarea + execCommand("copy") path doesn't require a secure origin —
+  // only a user-activation event, which the click handler is.
+  function legacyCopy(text: string): boolean {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "0";
+    ta.style.left = "0";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      return document.execCommand("copy");
+    } catch {
+      return false;
+    } finally {
+      document.body.removeChild(ta);
+    }
+  }
+
   async function copyPre(pre: HTMLPreElement, btn: HTMLButtonElement) {
     const code = pre.querySelector("code");
     if (!code) return;
-    try {
-      await navigator.clipboard.writeText(code.textContent ?? "");
+    const text = code.textContent ?? "";
+    let ok = false;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } catch (err) {
+        console.warn("[copy-btn] clipboard API failed, trying legacy", err);
+      }
+    }
+    if (!ok) ok = legacyCopy(text);
+    if (ok) {
       setState(btn, "success", "Copied", ICON_CHECK);
-    } catch (err) {
-      console.warn("[copy-btn]", err);
+    } else {
       setState(btn, "error", "Failed", ICON_CLIPBOARD);
     }
     setTimeout(() => setState(btn, "", "Copy", ICON_CLIPBOARD), COPY_RESET_MS);
